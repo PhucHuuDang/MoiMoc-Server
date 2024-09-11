@@ -6,8 +6,7 @@ import { DrizzleController } from './drizzle.controller';
 import { DrizzleService } from './drizzle.service';
 
 import * as schema from './schema/schema';
-
-export const DRIZZLE = Symbol('drizzle-connection');
+import { DRIZZLE } from 'types/drizzle';
 
 @Module({
   providers: [
