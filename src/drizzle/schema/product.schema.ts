@@ -1,5 +1,10 @@
 import { relations } from 'drizzle-orm';
 import { integer, numeric, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import { comment } from './comment.schema';
+import { orderDetailSchema } from './order-detail.schema';
+import { custom } from './custom.schema';
+import { productImages } from './product-images.schema';
+import { productType } from './product-type.schema';
 
 export const product = pgTable('product', {
   id: serial('id').primaryKey(),
@@ -15,29 +20,7 @@ export const product = pgTable('product', {
 export const productRelations = relations(product, ({ one, many }) => ({
   productImages: many(productImages),
   productType: one(productType),
-}));
-
-const productImages = pgTable('productImages', {
-  id: serial('id').primaryKey(),
-  imageUrl: text('imageUrl').notNull(),
-  productId: integer('productId').references(() => product.id),
-});
-
-export const productImagesRelations = relations(productImages, ({ one }) => ({
-  productImages: one(product, {
-    fields: [productImages.productId],
-    references: [product.id],
-  }),
-}));
-
-export const productType = pgTable('productType', {
-  id: serial('id').primaryKey(),
-  type: text('name').notNull(),
-});
-
-export const productTypeRelations = relations(productType, ({ one }) => ({
-  product: one(product, {
-    fields: [productType.id],
-    references: [product.id],
-  }),
+  comments: many(comment),
+  orderDetail: one(orderDetailSchema),
+  custom: many(custom),
 }));

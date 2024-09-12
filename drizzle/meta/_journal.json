@@ -15,6 +15,34 @@
       "when": 1726071661925,
       "tag": "0001_living_tomas",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1726152916431,
+      "tag": "0002_colossal_sleepwalker",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1726154654300,
+      "tag": "0003_wakeful_songbird",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1726154886840,
+      "tag": "0004_tearful_nextwave",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1726154939321,
+      "tag": "0005_melted_the_leader",
+      "breakpoints": true
     }
   ]
 }

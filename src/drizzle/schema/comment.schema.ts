@@ -1,6 +1,8 @@
 import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
-import { user } from './user.schema';
 import { relations } from 'drizzle-orm';
+
+import { user } from './user.schema';
+import { product } from './product.schema';
 
 export const comment = pgTable('comment', {
   id: serial('id').primaryKey(),
@@ -8,11 +10,14 @@ export const comment = pgTable('comment', {
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').defaultNow(),
   userId: integer('userId').references(() => user.id),
+
+  productId: integer('productId').references(() => product.id),
 });
 
-export const commentRelations = relations(comment, ({ one }) => ({
-  user: one(user, {
-    fields: [comment.userId],
-    references: [user.id],
+export const commentRelations = relations(comment, ({ one, many }) => ({
+  user: many(user),
+  product: one(product, {
+    fields: [comment.productId],
+    references: [product.id],
   }),
 }));

@@ -2,6 +2,7 @@ import { relations } from 'drizzle-orm';
 import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 import { phone } from './phone.schema';
 import { address } from './address.schema';
+import { comment } from './comment.schema';
 
 export const user = pgTable('user', {
   id: serial('id').primaryKey(),
@@ -12,9 +13,10 @@ export const user = pgTable('user', {
   updated_at: timestamp('updated_at').defaultNow(),
 });
 
-export const userRelations = relations(user, ({ many }) => ({
+export const userRelations = relations(user, ({ one, many }) => ({
   phone: many(phone),
   address: many(address),
+  comments: many(comment),
 }));
 // export const phone = pgTable('phone', {
 //   id: serial('id ').primaryKey(),

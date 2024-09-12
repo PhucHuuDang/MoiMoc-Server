@@ -1,0 +1,1 @@
+ALTER TABLE "productTypes" RENAME TO "productType";
