@@ -4,9 +4,11 @@ import { relations } from 'drizzle-orm';
 
 export const address = pgTable('address', {
   address: text('address').notNull(),
-  created_at: timestamp('created_at').defaultNow(),
-  updated_at: timestamp('updated_at').defaultNow(),
-  userId: integer('userId').references(() => user.id),
+  createdAat: timestamp('createdAt').defaultNow(),
+  updatedAat: timestamp('updatedAt').defaultNow(),
+  userId: integer('userId')
+    .references(() => user.id)
+    .notNull(),
 });
 
 export const addressRelations = relations(address, ({ one }) => ({

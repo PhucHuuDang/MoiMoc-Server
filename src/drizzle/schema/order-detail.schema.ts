@@ -1,4 +1,4 @@
-import { integer, pgTable, serial } from 'drizzle-orm/pg-core';
+import { integer, pgTable, serial, timestamp } from 'drizzle-orm/pg-core';
 import { user } from './user.schema';
 import { relations } from 'drizzle-orm';
 import { product } from './product.schema';
@@ -11,7 +11,11 @@ export const orderDetailSchema = pgTable('orderDetail', {
     .references(() => user.id),
   paymentHistoryId: integer('paymentHistoryId').references(
     () => paymentHistory.id,
+    { onDelete: 'cascade' },
   ),
+
+  createdAt: timestamp('createdAt', { mode: 'string' }).notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: 'string' }).notNull().defaultNow(),
 });
 
 export const orderDetailRelations = relations(

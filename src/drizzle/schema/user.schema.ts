@@ -1,4 +1,5 @@
-import { relations } from 'drizzle-orm';
+import { InferSelectModel, relations } from 'drizzle-orm';
+import { z } from 'zod';
 import {
   integer,
   pgEnum,
@@ -11,6 +12,7 @@ import {
 import { phone } from './phone.schema';
 import { address } from './address.schema';
 import { comment } from './comment.schema';
+import { createInsertSchema } from 'drizzle-zod';
 
 export const userRole = pgEnum('role', ['ADMIN', 'STAFF', 'MEMBER']);
 
@@ -20,8 +22,11 @@ export const user = pgTable('user', {
   email: varchar('email', { length: 255 }).notNull().unique(),
   phone: text('phone').notNull(),
   role: userRole('role').default('MEMBER'),
-  created_at: timestamp('created_at').defaultNow(),
-  updated_at: timestamp('updated_at').defaultNow(),
+  // created_at: timestamp('created_at').defaultNow(),
+  // updated_at: timestamp('updated_at').defaultNow(),
+
+  createdAt: timestamp('createdAt', { mode: 'string' }).defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: 'string' }).defaultNow(),
 });
 
 export const userRelations = relations(user, ({ one, many }) => ({
@@ -29,6 +34,16 @@ export const userRelations = relations(user, ({ one, many }) => ({
   address: many(address),
   comments: many(comment),
 }));
+
+export const userZod = createInsertSchema(user).extend({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email').min(1, 'Email is required'),
+  phone: z.string().min(1, 'Phone is required'),
+  role: z.enum(['ADMIN', 'STAFF', 'MEMBER']).optional(),
+});
+
+// export type UserShapeType = z.infer<typeof userZod>;
+// export type UserShapeType = InferSelectModel<typeof user>;
 // export const phone = pgTable('phone', {
 //   id: serial('id ').primaryKey(),
 //   phone: text('phone').notNull(),

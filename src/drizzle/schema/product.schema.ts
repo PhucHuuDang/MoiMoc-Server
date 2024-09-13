@@ -23,7 +23,11 @@ export const product = pgTable('product', {
     undefined,
   ),
   discountPercentage: numeric('discountPercentage').default(undefined),
-  quantity: numeric('stock').notNull(),
+  quantity: numeric('quantity').notNull(),
+
+  orderDetailId: integer('orderDetailId')
+    .references(() => orderDetailSchema.id)
+    .default(undefined),
 
   productTypeId: integer('productTypeId')
     .references(() => productType.id)
@@ -34,6 +38,9 @@ export const productRelations = relations(product, ({ one, many }) => ({
   productImages: many(productImages),
   productType: one(productType),
   comments: many(comment),
-  orderDetail: one(orderDetailSchema),
+  orderDetail: one(orderDetailSchema, {
+    fields: [product.orderDetailId],
+    references: [orderDetailSchema.id],
+  }),
   custom: many(custom),
 }));

@@ -15,8 +15,8 @@ export const comment = pgTable('comment', {
   id: serial('id').primaryKey(),
   content: text('content').notNull(),
   rating: numeric('rating').default(undefined),
-  created_at: timestamp('created_at').defaultNow(),
-  updated_at: timestamp('updated_at').defaultNow(),
+  createdAt: timestamp('createdAt', { mode: 'string' }).notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: 'string' }).notNull().defaultNow(),
   userId: integer('userId')
     .references(() => user.id)
     .notNull(),

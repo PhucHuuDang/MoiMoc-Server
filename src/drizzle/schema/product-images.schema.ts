@@ -6,7 +6,9 @@ import { product } from './product.schema';
 export const productImages = pgTable('productImages', {
   id: serial('id').primaryKey(),
   imageUrl: text('imageUrl').notNull(),
-  productId: integer('productId').references(() => product.id),
+  productId: integer('productId')
+    .references(() => product.id)
+    .notNull(),
 });
 
 export const productImagesRelations = relations(productImages, ({ one }) => ({
