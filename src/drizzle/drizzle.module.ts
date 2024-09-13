@@ -6,8 +6,9 @@ import { DrizzleController } from './drizzle.controller';
 import { DrizzleService } from './drizzle.service';
 
 import * as schema from './schema/schema';
-// import { DRIZZLE } from 'types/drizzle';
 export const DRIZZLE = Symbol('drizzle-connection');
+// export const DRIZZLE = 'DRIZZLE_CONNECTION';
+// import { DRIZZLE } from 'types/drizzle';
 
 @Module({
   providers: [
@@ -23,7 +24,7 @@ export const DRIZZLE = Symbol('drizzle-connection');
           ssl: { rejectUnauthorized: false },
         });
 
-        drizzle(pool, { schema }) as NodePgDatabase<typeof schema>;
+        return drizzle(pool, { schema }) as NodePgDatabase<typeof schema>;
       },
     },
     DrizzleService,

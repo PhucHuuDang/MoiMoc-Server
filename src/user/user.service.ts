@@ -9,9 +9,10 @@ import { DRIZZLE } from 'src/drizzle/drizzle.module';
 export class UserService {
   constructor(@Inject(DRIZZLE) private readonly db: DrizzleDbType) {
     console.log('DRIZZLE injected:', this.db);
+    console.log({ DRIZZLE });
   }
 
-  create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto) {
     const dataTest = {
       name: 'test',
       email: '',
@@ -22,7 +23,7 @@ export class UserService {
 
     console.log({ createUserDto });
 
-    const insertDataUser = this.db
+    const insertDataUser = await this.db
       .insert(user)
       .values({
         name: createUserDto.name,
@@ -34,8 +35,8 @@ export class UserService {
     return insertDataUser;
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll() {
+    return await this.db.select().from(user);
   }
 
   findOne(id: number) {
