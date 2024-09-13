@@ -1,14 +1,25 @@
 import { relations } from 'drizzle-orm';
-import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import {
+  integer,
+  pgEnum,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  varchar,
+} from 'drizzle-orm/pg-core';
 import { phone } from './phone.schema';
 import { address } from './address.schema';
 import { comment } from './comment.schema';
 
+export const userRole = pgEnum('role', ['ADMIN', 'STAFF', 'MEMBER']);
+
 export const user = pgTable('user', {
   id: serial('id').primaryKey(),
-  name: text('name'),
-  email: text('email').notNull().unique(),
+  name: varchar('name', { length: 255 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
   phone: text('phone').notNull(),
+  role: userRole('role').default('MEMBER'),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').defaultNow(),
 });

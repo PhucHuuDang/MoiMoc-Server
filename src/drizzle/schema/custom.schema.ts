@@ -1,11 +1,18 @@
 import { relations } from 'drizzle-orm';
-import { integer, numeric, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import {
+  decimal,
+  integer,
+  numeric,
+  pgTable,
+  serial,
+  text,
+} from 'drizzle-orm/pg-core';
 import { product } from './product.schema';
 
 export const custom = pgTable('custom', {
   id: serial('id').primaryKey(),
   option: text('options').notNull(),
-  price: numeric('price').default('0'),
+  price: numeric('price', { precision: 15, scale: 0 }).notNull(),
 
   productId: integer('productId')
     .references(() => product.id)

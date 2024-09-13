@@ -9,8 +9,5 @@ export const productType = pgTable('productType', {
 });
 
 export const productTypeRelations = relations(productType, ({ one }) => ({
-  product: one(product, {
-    fields: [productType.id],
-    references: [product.id],
-  }),
+  product: one(product),
 }));
