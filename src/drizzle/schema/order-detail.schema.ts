@@ -14,6 +14,15 @@ export const orderDetailSchema = pgTable('orderDetail', {
     { onDelete: 'cascade' },
   ),
 
+  productId: integer('productId')
+    .notNull()
+    .references(() => product.id)
+    .notNull(),
+
+  useId: integer('userId')
+    .references(() => user.id)
+    .notNull(),
+
   createdAt: timestamp('createdAt', { mode: 'string' }).notNull().defaultNow(),
   updatedAt: timestamp('updatedAt', { mode: 'string' }).notNull().defaultNow(),
 });

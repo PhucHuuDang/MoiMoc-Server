@@ -10,7 +10,7 @@ export const phone = pgTable('phone', {
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').defaultNow(),
   userId: integer('userId')
-    .references(() => user.id)
+    .references(() => user.id, { onDelete: 'cascade' })
     .notNull(),
 });
 

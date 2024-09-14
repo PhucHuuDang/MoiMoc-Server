@@ -1,10 +1,13 @@
-import { Inject, Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DrizzleDbType } from 'types/drizzle';
-import { user } from 'src/drizzle/schema/user.schema';
+import { NewUser, user } from 'src/drizzle/schema/user.schema';
 import { DRIZZLE } from 'src/drizzle/drizzle.module';
 import { phone } from 'src/drizzle/schema/phone.schema';
+
+const saltOrRounds: number = 10;
 
 @Injectable()
 export class UserService {
@@ -13,14 +16,21 @@ export class UserService {
     // console.log({ DRIZZLE });
   }
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: NewUser) {
     console.log({ createUserDto });
+
+    const { phoneNumber, email, name, password } = createUserDto;
+
+    const hashPassword = await bcrypt.hash(password, saltOrRounds);
+
+    console.log({ hashPassword });
 
     const insertDataUser = await this.db
       .insert(user)
       .values({
-        name: createUserDto.name,
-        email: createUserDto.email,
+        name,
+        email,
+        password: hashPassword,
       })
       .returning({ userId: user.id });
 
@@ -32,7 +42,7 @@ export class UserService {
       .insert(phone)
       .values({
         userId: userId,
-        phone: createUserDto.phone,
+        phone: createUserDto.phoneNumber,
       })
       .returning();
 
@@ -46,7 +56,7 @@ export class UserService {
 
   async findAll() {
     // return await this.db.select().from(user);
-    return await this.db.query.user.findMany({
+    return this.db.query.user.findMany({
       with: {
         phone: true,
       },
