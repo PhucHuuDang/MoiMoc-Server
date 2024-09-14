@@ -4,23 +4,16 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { DrizzleDbType } from 'types/drizzle';
 import { user } from 'src/drizzle/schema/user.schema';
 import { DRIZZLE } from 'src/drizzle/drizzle.module';
+import { phone } from 'src/drizzle/schema/phone.schema';
 
 @Injectable()
 export class UserService {
   constructor(@Inject(DRIZZLE) private readonly db: DrizzleDbType) {
-    console.log('DRIZZLE injected:', this.db);
-    console.log({ DRIZZLE });
+    // console.log('DRIZZLE injected:', this.db);
+    // console.log({ DRIZZLE });
   }
 
   async create(createUserDto: CreateUserDto) {
-    const dataTest = {
-      name: 'test',
-      email: '',
-      phone: '',
-      role: 'MEMBER',
-    };
-    // this.db.update()
-
     console.log({ createUserDto });
 
     const insertDataUser = await this.db
@@ -28,15 +21,36 @@ export class UserService {
       .values({
         name: createUserDto.name,
         email: createUserDto.email,
+      })
+      .returning({ userId: user.id });
+
+    console.log({ insertDataUser });
+
+    const userId = insertDataUser[0].userId;
+
+    const insertPhones = await this.db
+      .insert(phone)
+      .values({
+        userId: userId,
         phone: createUserDto.phone,
-        // role: createUserDto.role,
       })
       .returning();
-    return insertDataUser;
+
+    console.log({ insertPhones });
+
+    return {
+      user: insertDataUser[0],
+      phone: insertPhones,
+    };
   }
 
   async findAll() {
-    return await this.db.select().from(user);
+    // return await this.db.select().from(user);
+    return await this.db.query.user.findMany({
+      with: {
+        phone: true,
+      },
+    });
   }
 
   findOne(id: number) {

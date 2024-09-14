@@ -18,7 +18,7 @@ export const comment = pgTable('comment', {
   createdAt: timestamp('createdAt', { mode: 'string' }).notNull().defaultNow(),
   updatedAt: timestamp('updatedAt', { mode: 'string' }).notNull().defaultNow(),
   userId: integer('userId')
-    .references(() => user.id)
+    .references(() => user.id, { onDelete: 'cascade' })
     .notNull(),
 
   productId: integer('productId')
