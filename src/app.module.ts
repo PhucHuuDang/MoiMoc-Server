@@ -7,7 +7,12 @@ import { UserModule } from './user/user.module';
 import { PhoneModule } from './phone/phone.module';
 
 @Module({
-  imports: [DrizzleModule, ConfigModule.forRoot({ isGlobal: true }), UserModule, PhoneModule],
+  imports: [
+    DrizzleModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+    UserModule,
+    PhoneModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

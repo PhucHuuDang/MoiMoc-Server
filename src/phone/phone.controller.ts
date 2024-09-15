@@ -10,7 +10,7 @@ import {
 import { PhoneService } from './phone.service';
 import { CreatePhoneDto } from './dto/create-phone.dto';
 import { UpdatePhoneDto } from './dto/update-phone.dto';
-import { NewPhoneNumber } from 'src/drizzle/schema/phone.schema';
+import { NewPhoneNumber } from 'src/drizzle/schema/phones.schema';
 
 @Controller('phone')
 export class PhoneController {

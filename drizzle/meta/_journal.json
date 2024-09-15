@@ -134,6 +134,41 @@
       "when": 1726332784256,
       "tag": "0018_yielding_spot",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1726411027000,
+      "tag": "0019_watery_maginty",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1726414380108,
+      "tag": "0020_acoustic_forgotten_one",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1726415760753,
+      "tag": "0021_dusty_whistler",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1726416658314,
+      "tag": "0022_white_warhawk",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1726416788772,
+      "tag": "0023_naive_lockjaw",
+      "breakpoints": true
     }
   ]
 }

@@ -17,3 +17,5 @@ export const productImagesRelations = relations(productImages, ({ one }) => ({
     references: [product.id],
   }),
 }));
+
+export type ProductImagesProps = typeof productImages.$inferInsert;

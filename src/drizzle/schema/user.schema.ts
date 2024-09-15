@@ -9,7 +9,7 @@ import {
   timestamp,
   varchar,
 } from 'drizzle-orm/pg-core';
-import { phone } from './phone.schema';
+import { phones } from './phones.schema';
 import { address } from './address.schema';
 import { comment } from './comment.schema';
 import { createInsertSchema } from 'drizzle-zod';
@@ -22,22 +22,28 @@ export const user = pgTable('user', {
   email: varchar('email', { length: 255 }).notNull().unique(),
   role: userRole('role').default('MEMBER'),
   password: varchar('password', { length: 255 }).notNull(),
+  avatar: text('avatar'),
 
   createdAt: timestamp('createdAt', { mode: 'string' }).defaultNow(),
   updatedAt: timestamp('updatedAt', { mode: 'string' }).defaultNow(),
 });
 
 export const userRelations = relations(user, ({ one, many }) => ({
-  phone: many(phone),
+  phone: many(phones),
   address: many(address),
   comments: many(comment),
 }));
 
-export const userZod = createInsertSchema(user).extend({
-  name: z.string().min(5, 'Name is required'),
-  email: z.string().email('Invalid email').min(1, 'Email is required'),
-  phone: z.string().min(10, 'Phone is required'),
-  role: z.enum(['ADMIN', 'STAFF', 'MEMBER']).optional(),
+export const userZod = createInsertSchema(user, {
+  email: (schema) =>
+    schema.email
+      .email()
+      .min(5, {
+        message: 'Email must be at least 5 characters long',
+      })
+      .max(100, {
+        message: 'Email must be at most 100 characters long',
+      }),
 });
 
 export type NewUser = typeof user.$inferInsert & {

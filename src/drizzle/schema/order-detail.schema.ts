@@ -41,3 +41,5 @@ export const orderDetailRelations = relations(
     }),
   }),
 );
+
+export type OrderDetailProps = typeof orderDetailSchema.$inferInsert;

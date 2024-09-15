@@ -5,14 +5,18 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { DrizzleDbType } from 'types/drizzle';
 import { NewUser, user } from 'src/drizzle/schema/user.schema';
 import { DRIZZLE } from 'src/drizzle/drizzle.module';
-import { phone } from 'src/drizzle/schema/phone.schema';
+import { phones } from 'src/drizzle/schema/phones.schema';
+import { PhoneService } from 'src/phone/phone.service';
 
 const saltOrRounds: number = 10;
 
 @Injectable()
 export class UserService {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDbType) {
-    // console.log('DRIZZLE injected:', this.db);
+  constructor(
+    @Inject(DRIZZLE) private readonly db: DrizzleDbType,
+    private readonly phone: PhoneService,
+  ) {
+    console.log('DRIZZLE injected:', this.db);
     // console.log({ DRIZZLE });
   }
 
@@ -39,7 +43,7 @@ export class UserService {
     const userId = insertDataUser[0].userId;
 
     const insertPhones = await this.db
-      .insert(phone)
+      .insert(phones)
       .values({
         userId: userId,
         phone: createUserDto.phoneNumber,
@@ -48,9 +52,13 @@ export class UserService {
 
     console.log({ insertPhones });
 
+    // return {
+    //   user: insertDataUser[0],
+    //   phone: insertPhones,
+    // };
     return {
-      user: insertDataUser[0],
-      phone: insertPhones,
+      user: insertDataUser[0].userId,
+      message: 'User created successfully',
     };
   }
 
@@ -58,7 +66,7 @@ export class UserService {
     // return await this.db.select().from(user);
     return this.db.query.user.findMany({
       with: {
-        phone: true,
+        phones: true,
       },
     });
   }
