@@ -1,27 +1,18 @@
 import { z } from 'zod';
-import {
-  integer,
-  pgTable,
-  serial,
-  text,
-  timestamp,
-  varchar,
-} from 'drizzle-orm/pg-core';
+import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 import { user } from './user.schema';
 import { relations } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 import { isValidPhone } from 'regex-validation/phone-validation';
-import { createId } from '@paralleldrive/cuid2';
 
 export type NewPhoneNumber = typeof phones.$inferInsert;
 
 export const phones = pgTable('phones', {
-  id: varchar('id', { length: 128 })
-    .$defaultFn(() => createId())
-    .primaryKey(),
+  id: serial('id').primaryKey(),
   phone: text('phone').notNull(),
   createdAt: timestamp('createdAt', { mode: 'string' }).defaultNow(),
   updatedAt: timestamp('updatedAt', { mode: 'string' }).defaultNow(),
+
   userId: integer('userId')
     .references(() => user.id, { onDelete: 'cascade' })
     .notNull(),
@@ -47,3 +38,5 @@ export const phonesZod = createInsertSchema(phones, {
         message: 'Phone number is not valid',
       }),
 });
+
+type PhoneTypes = z.infer<typeof phonesZod>;

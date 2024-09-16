@@ -31,7 +31,7 @@ export const product = pgTable('product', {
   quantity: numeric('quantity').notNull(),
 
   productTypeId: integer('productTypeId')
-    .references(() => productType.id)
+    .references(() => productType.id, { onDelete: 'cascade' })
     .notNull(),
 });
 

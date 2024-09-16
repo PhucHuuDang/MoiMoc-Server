@@ -18,6 +18,7 @@ export class PhoneController {
 
   @Post()
   create(@Body() createPhoneDto: NewPhoneNumber) {
+    console.log({ createPhoneDto });
     return this.phoneService.create(createPhoneDto);
   }
 

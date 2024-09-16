@@ -6,10 +6,12 @@ import {
   text,
   timestamp,
 } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { InferInsertModel, relations } from 'drizzle-orm';
 
 import { user } from './user.schema';
 import { product } from './product.schema';
+
+export type CommentProps = InferInsertModel<typeof comment>;
 
 export const comment = pgTable('comment', {
   id: serial('id').primaryKey(),
@@ -17,17 +19,21 @@ export const comment = pgTable('comment', {
   rating: numeric('rating').default(undefined),
   createdAt: timestamp('createdAt', { mode: 'string' }).notNull().defaultNow(),
   updatedAt: timestamp('updatedAt', { mode: 'string' }).notNull().defaultNow(),
+
   userId: integer('userId')
     .references(() => user.id, { onDelete: 'cascade' })
     .notNull(),
 
   productId: integer('productId')
-    .references(() => product.id)
+    .references(() => product.id, { onDelete: 'cascade' })
     .notNull(),
 });
 
 export const commentRelations = relations(comment, ({ one, many }) => ({
-  user: many(user),
+  user: one(user, {
+    fields: [comment.userId],
+    references: [user.id],
+  }),
   product: one(product, {
     fields: [comment.productId],
     references: [product.id],

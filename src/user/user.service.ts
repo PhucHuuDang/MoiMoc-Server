@@ -7,6 +7,7 @@ import { NewUser, user } from 'src/drizzle/schema/user.schema';
 import { DRIZZLE } from 'src/drizzle/drizzle.module';
 import { phones } from 'src/drizzle/schema/phones.schema';
 import { PhoneService } from 'src/phone/phone.service';
+import { createId } from '@paralleldrive/cuid2';
 
 const saltOrRounds: number = 10;
 
@@ -16,7 +17,7 @@ export class UserService {
     @Inject(DRIZZLE) private readonly db: DrizzleDbType,
     private readonly phone: PhoneService,
   ) {
-    console.log('DRIZZLE injected:', this.db);
+    // console.log('DRIZZLE injected:', this.db);
     // console.log({ DRIZZLE });
   }
 
@@ -46,7 +47,7 @@ export class UserService {
       .insert(phones)
       .values({
         userId: userId,
-        phone: createUserDto.phoneNumber,
+        phone: phoneNumber,
       })
       .returning();
 
