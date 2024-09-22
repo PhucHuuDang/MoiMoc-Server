@@ -15,7 +15,7 @@ import {
 import { comment } from './comment.schema';
 import { orderDetailSchema } from './order-detail.schema';
 import { custom } from './custom.schema';
-import { productImages } from './product-images.schema';
+import { ProductImagesProps, productImages } from './product-images.schema';
 import { productType } from './product-type.schema';
 
 export const product = pgTable('product', {
@@ -37,12 +37,18 @@ export const product = pgTable('product', {
 
 export const productRelations = relations(product, ({ one, many }) => ({
   productImages: many(productImages),
-  productType: one(productType),
+  productType: one(productType, {
+    fields: [product.productTypeId],
+    references: [productType.id],
+  }),
   comments: many(comment),
-  orderDetail: one(orderDetailSchema),
+  // orderDetail: one(orderDetailSchema),
   custom: many(custom),
 }));
 
 export const productZod = createInsertSchema(product);
 
-export type ProductShapeType = InferInsertModel<typeof product>;
+export type ProductShapeType = InferInsertModel<typeof product> &
+  Omit<ProductImagesProps, 'productId'>;
+
+type Test = Omit<ProductImagesProps, 'productId'>;

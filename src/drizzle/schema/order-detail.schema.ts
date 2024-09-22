@@ -3,24 +3,28 @@ import { user } from './user.schema';
 import { relations } from 'drizzle-orm';
 import { product } from './product.schema';
 import { paymentHistory } from './payment-history.schema';
+import { paymentMethod } from './payment-method.schema';
+import { orderProducts } from './order-products';
+import { delivery } from './delivery-method.schema';
 
 export const orderDetailSchema = pgTable('orderDetail', {
   id: serial('id').primaryKey(),
+
   userId: integer('userId')
     .notNull()
     .references(() => user.id),
-  paymentHistoryId: integer('paymentHistoryId').references(
-    () => paymentHistory.id,
-    { onDelete: 'cascade' },
-  ),
 
-  productId: integer('productId')
-    .notNull()
-    .references(() => product.id)
+  // paymentHistoryId: integer('paymentHistoryId').references(
+  //   () => paymentHistory.id,
+  //   { onDelete: 'cascade' },
+  // ),
+
+  paymentMethodId: integer('paymentMethod')
+    .references(() => paymentMethod.id)
     .notNull(),
 
-  useId: integer('userId')
-    .references(() => user.id)
+  deliveryMethodId: integer('deliveryMethodId')
+    .references(() => delivery.id)
     .notNull(),
 
   createdAt: timestamp('createdAt', { mode: 'string' }).notNull().defaultNow(),
@@ -34,10 +38,22 @@ export const orderDetailRelations = relations(
       fields: [orderDetailSchema.userId],
       references: [user.id],
     }),
-    product: many(product),
-    paymentHistory: one(paymentHistory, {
-      fields: [orderDetailSchema.id],
-      references: [paymentHistory.id],
+    // product: many(product),
+    orderProducts: many(orderProducts),
+
+    deliveryMethod: one(delivery, {
+      fields: [orderDetailSchema.deliveryMethodId],
+      references: [delivery.id],
+    }),
+
+    // paymentHistory: one(paymentHistory, {
+    //   fields: [orderDetailSchema.id],
+    //   references: [paymentHistory.id],
+    // }),
+
+    paymentMethod: one(paymentMethod, {
+      fields: [orderDetailSchema.paymentMethodId],
+      references: [paymentMethod.id],
     }),
   }),
 );

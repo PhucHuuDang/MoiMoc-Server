@@ -14,15 +14,8 @@ export const delivery = pgTable('deliveryMethod', {
   method: text('method').notNull(),
   // price: numeric('price').notNull(),
   price: numeric('price', { precision: 15, scale: 0 }).notNull(),
-
-  orderDetailId: integer('orderDetailId')
-    .references(() => orderDetailSchema.id)
-    .notNull(),
 });
 
 export const deliveryRelations = relations(delivery, ({ one }) => ({
-  orderDetail: one(orderDetailSchema, {
-    fields: [delivery.orderDetailId],
-    references: [orderDetailSchema.id],
-  }),
+  orderDetail: one(orderDetailSchema),
 }));
