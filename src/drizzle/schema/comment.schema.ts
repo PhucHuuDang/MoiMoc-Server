@@ -11,8 +11,6 @@ import { InferInsertModel, relations } from 'drizzle-orm';
 import { user } from './user.schema';
 import { product } from './product.schema';
 
-export type CommentProps = InferInsertModel<typeof comment>;
-
 export const comment = pgTable('comment', {
   id: serial('id').primaryKey(),
   content: text('content').notNull(),
@@ -39,3 +37,6 @@ export const commentRelations = relations(comment, ({ one, many }) => ({
     references: [product.id],
   }),
 }));
+
+export type InsertCommentProps = InferInsertModel<typeof comment>;
+export type SelectCommentProps = InferInsertModel<typeof comment>;

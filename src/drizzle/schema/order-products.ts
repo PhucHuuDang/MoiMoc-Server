@@ -3,6 +3,22 @@ import { product } from './product.schema';
 import { orderDetailSchema } from './order-detail.schema';
 import { InferInsertModel, relations } from 'drizzle-orm';
 
+// // Insert into orderDetailSchema
+// const newOrderDetail = await db.insert(orderDetailSchema).values({
+//   userId: someUserId,
+//   paymentHistoryId: somePaymentHistoryId,
+//   paymentMethodId: somePaymentMethodId,
+// });
+
+// // Insert multiple products into orderProducts
+// const orderProductsData = products.map((product) => ({
+//   orderDetailId: newOrderDetail.id,
+//   productId: product.id,
+//   quantity: product.quantity,
+// }));
+
+// await db.insert(orderProducts).values(orderProductsData);
+
 export const orderProducts = pgTable('orderProducts', {
   id: serial('id').primaryKey(),
 

@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm';
+import { InferSelectModel, relations } from 'drizzle-orm';
 import { integer, numeric, pgTable, serial, text } from 'drizzle-orm/pg-core';
 
 import { product } from './product.schema';
@@ -18,4 +18,5 @@ export const productImagesRelations = relations(productImages, ({ one }) => ({
   }),
 }));
 
-export type ProductImagesProps = typeof productImages.$inferInsert;
+export type InsertProductImagesProps = typeof productImages.$inferInsert;
+export type SelectProductImagesProps = InferSelectModel<typeof productImages>;

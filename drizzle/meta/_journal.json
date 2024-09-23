@@ -253,6 +253,20 @@
       "when": 1726472730597,
       "tag": "0035_material_dust",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1727026333822,
+      "tag": "0036_true_sleeper",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1727055498881,
+      "tag": "0037_luxuriant_christian_walker",
+      "breakpoints": true
     }
   ]
 }

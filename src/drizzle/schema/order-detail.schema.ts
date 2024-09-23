@@ -1,4 +1,4 @@
-import { integer, pgTable, serial, timestamp } from 'drizzle-orm/pg-core';
+import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 import { user } from './user.schema';
 import { relations } from 'drizzle-orm';
 import { product } from './product.schema';
@@ -14,11 +14,6 @@ export const orderDetailSchema = pgTable('orderDetail', {
     .notNull()
     .references(() => user.id),
 
-  // paymentHistoryId: integer('paymentHistoryId').references(
-  //   () => paymentHistory.id,
-  //   { onDelete: 'cascade' },
-  // ),
-
   paymentMethodId: integer('paymentMethod')
     .references(() => paymentMethod.id)
     .notNull(),
@@ -26,6 +21,8 @@ export const orderDetailSchema = pgTable('orderDetail', {
   deliveryMethodId: integer('deliveryMethodId')
     .references(() => delivery.id)
     .notNull(),
+
+  discountCode: text('discountCode'),
 
   createdAt: timestamp('createdAt', { mode: 'string' }).notNull().defaultNow(),
   updatedAt: timestamp('updatedAt', { mode: 'string' }).notNull().defaultNow(),
@@ -38,18 +35,13 @@ export const orderDetailRelations = relations(
       fields: [orderDetailSchema.userId],
       references: [user.id],
     }),
-    // product: many(product),
+
     orderProducts: many(orderProducts),
 
     deliveryMethod: one(delivery, {
       fields: [orderDetailSchema.deliveryMethodId],
       references: [delivery.id],
     }),
-
-    // paymentHistory: one(paymentHistory, {
-    //   fields: [orderDetailSchema.id],
-    //   references: [paymentHistory.id],
-    // }),
 
     paymentMethod: one(paymentMethod, {
       fields: [orderDetailSchema.paymentMethodId],

@@ -18,7 +18,6 @@ export class UserService {
     private readonly phone: PhoneService,
   ) {
     // console.log('DRIZZLE injected:', this.db);
-    // console.log({ DRIZZLE });
   }
 
   async create(createUserDto: NewUser) {
@@ -51,7 +50,7 @@ export class UserService {
       })
       .returning();
 
-    console.log({ insertPhones });
+    // console.log({ insertPhones });
 
     // return {
     //   user: insertDataUser[0],

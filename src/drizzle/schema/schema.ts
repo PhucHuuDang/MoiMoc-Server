@@ -10,3 +10,4 @@ export * from './payment-history.schema';
 export * from './custom.schema';
 export * from './product-images.schema';
 export * from './product-type.schema';
+export * from './order-products';

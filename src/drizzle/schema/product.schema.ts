@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createInsertSchema } from 'drizzle-zod';
 
-import { InferInsertModel, relations } from 'drizzle-orm';
+import { InferInsertModel, InferSelectModel, relations } from 'drizzle-orm';
 import {
   decimal,
   integer,
@@ -9,14 +9,20 @@ import {
   pgTable,
   serial,
   text,
+  timestamp,
   varchar,
 } from 'drizzle-orm/pg-core';
 
 import { comment } from './comment.schema';
 import { orderDetailSchema } from './order-detail.schema';
 import { custom } from './custom.schema';
-import { ProductImagesProps, productImages } from './product-images.schema';
-import { productType } from './product-type.schema';
+import {
+  InsertProductImagesProps,
+  SelectProductImagesProps,
+  productImages,
+} from './product-images.schema';
+import { SelectProductTypeProps, productType } from './product-type.schema';
+import { orderProducts } from './order-products';
 
 export const product = pgTable('product', {
   id: serial('id').primaryKey(),
@@ -33,6 +39,9 @@ export const product = pgTable('product', {
   productTypeId: integer('productTypeId')
     .references(() => productType.id, { onDelete: 'cascade' })
     .notNull(),
+
+  createdAt: timestamp('createdAt', { mode: 'string' }).notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: 'string' }).notNull().defaultNow(),
 });
 
 export const productRelations = relations(product, ({ one, many }) => ({
@@ -43,12 +52,28 @@ export const productRelations = relations(product, ({ one, many }) => ({
   }),
   comments: many(comment),
   // orderDetail: one(orderDetailSchema),
+
+  orderProducts: one(orderProducts),
+
   custom: many(custom),
 }));
 
 export const productZod = createInsertSchema(product);
 
-export type ProductShapeType = InferInsertModel<typeof product> &
-  Omit<ProductImagesProps, 'productId'>;
+export type ProductShapeType = InferInsertModel<typeof product>;
 
-type Test = Omit<ProductImagesProps, 'productId'>;
+export type SelectProductProps = InferSelectModel<typeof product>;
+
+export type AllProductProps = SelectProductProps & {
+  productImages: SelectProductImagesProps[];
+  productType: SelectProductTypeProps;
+  comments: SelectProductProps[];
+};
+
+export type newProductProps = ProductShapeType & {
+  discountPercent?: number;
+  discountPrice?: number;
+} & {
+  imageUrl: string[];
+  productTypeId: number;
+};
