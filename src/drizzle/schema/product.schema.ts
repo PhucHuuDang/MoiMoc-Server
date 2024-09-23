@@ -71,7 +71,7 @@ export type AllProductProps = SelectProductProps & {
 };
 
 export type newProductProps = ProductShapeType & {
-  discountPercent?: number;
+  discountPercentage?: number;
   discountPrice?: number;
 } & {
   imageUrl: string[];

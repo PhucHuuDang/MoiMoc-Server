@@ -61,8 +61,8 @@ export class ProductsService {
 
     const priceAsNumber = parseFloat(price);
 
-    const calculateDiscountPrice = props.discountPercent
-      ? priceAsNumber - (priceAsNumber * props.discountPercent) / 100
+    const calculateDiscountPrice = props.discountPercentage
+      ? priceAsNumber - (priceAsNumber * props.discountPercentage) / 100
       : undefined;
 
     const insertValues: any = {
