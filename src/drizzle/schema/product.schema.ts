@@ -1,7 +1,7 @@
-import { z } from 'zod';
-import { createInsertSchema } from 'drizzle-zod';
+import { z } from "zod";
+import { createInsertSchema } from "drizzle-zod";
 
-import { InferInsertModel, InferSelectModel, relations } from 'drizzle-orm';
+import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
 import {
   decimal,
   integer,
@@ -11,37 +11,38 @@ import {
   text,
   timestamp,
   varchar,
-} from 'drizzle-orm/pg-core';
+} from "drizzle-orm/pg-core";
 
-import { comment } from './comment.schema';
-import { orderDetailSchema } from './order-detail.schema';
-import { custom } from './custom.schema';
+import { comment } from "./comment.schema";
+import { orderDetailSchema } from "./order-detail.schema";
+import { custom } from "./custom.schema";
 import {
   InsertProductImagesProps,
   SelectProductImagesProps,
   productImages,
-} from './product-images.schema';
-import { SelectProductTypeProps, productType } from './product-type.schema';
-import { orderProducts } from './order-products';
+} from "./product-images.schema";
+import { SelectProductTypeProps, productType } from "./product-type.schema";
+import { orderProducts } from "./order-products";
+import { feedback } from "./feedback.schema";
 
-export const product = pgTable('product', {
-  id: serial('id').primaryKey(),
-  productName: varchar('productName', { length: 255 }).notNull(),
-  productDescription: text('productDescription').notNull(),
-  price: numeric('price', { precision: 15, scale: 0 }).notNull(),
+export const product = pgTable("product", {
+  id: serial("id").primaryKey(),
+  productName: varchar("productName", { length: 255 }).notNull(),
+  productDescription: text("productDescription").notNull(),
+  price: numeric("price", { precision: 15, scale: 0 }).notNull(),
 
-  discountPrice: numeric('discountPrice', { precision: 15, scale: 0 }).default(
-    undefined,
+  discountPrice: numeric("discountPrice", { precision: 15, scale: 0 }).default(
+    undefined
   ),
-  discountPercentage: numeric('discountPercentage').default(undefined),
-  quantity: numeric('quantity').notNull(),
+  discountPercentage: numeric("discountPercentage").default(undefined),
+  quantity: numeric("quantity").notNull(),
 
-  productTypeId: integer('productTypeId')
-    .references(() => productType.id, { onDelete: 'cascade' })
+  productTypeId: integer("productTypeId")
+    .references(() => productType.id, { onDelete: "cascade" })
     .notNull(),
 
-  createdAt: timestamp('createdAt', { mode: 'string' }).notNull().defaultNow(),
-  updatedAt: timestamp('updatedAt', { mode: 'string' }).notNull().defaultNow(),
+  createdAt: timestamp("createdAt", { mode: "string" }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { mode: "string" }).notNull().defaultNow(),
 });
 
 export const productRelations = relations(product, ({ one, many }) => ({
@@ -56,6 +57,8 @@ export const productRelations = relations(product, ({ one, many }) => ({
   orderProducts: one(orderProducts),
 
   custom: many(custom),
+
+  feedback: many(feedback),
 }));
 
 export const productZod = createInsertSchema(product);

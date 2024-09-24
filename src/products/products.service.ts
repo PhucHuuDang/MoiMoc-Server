@@ -1,25 +1,30 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { DRIZZLE } from 'src/drizzle/drizzle.module';
+import { Inject, Injectable } from "@nestjs/common";
+import { eq } from "drizzle-orm";
+import { DRIZZLE } from "src/drizzle/drizzle.module";
+import { comment } from "src/drizzle/schema/comment.schema";
+import { feedback } from "src/drizzle/schema/feedback.schema";
 import {
   InsertProductImagesProps,
   productImages,
-} from 'src/drizzle/schema/product-images.schema';
+} from "src/drizzle/schema/product-images.schema";
+import { productType } from "src/drizzle/schema/product-type.schema";
 import {
   ProductShapeType,
   SelectProductProps,
   newProductProps,
   product,
-} from 'src/drizzle/schema/product.schema';
-import { ProductImagesService } from 'src/product-images/product-images.service';
-import { DrizzleDbType } from 'types/drizzle';
+} from "src/drizzle/schema/product.schema";
+import { ProductImagesService } from "src/product-images/product-images.service";
+import { DrizzleDbType } from "types/drizzle";
 
 @Injectable()
 export class ProductsService {
   constructor(
     @Inject(DRIZZLE) private readonly db: DrizzleDbType,
-    private readonly productImages: ProductImagesService,
+    private readonly productImages: ProductImagesService
   ) {}
 
+  // * find
   async findAllProducts(): Promise<SelectProductProps[] | []> {
     const productsFilter = await this.db.query.product.findMany({
       with: {
@@ -52,6 +57,106 @@ export class ProductsService {
     return products;
   }
 
+  async findDetailProduct(productId: number) {
+    // if (typeof productId === "object" && productId.productId) {
+    //   productId = Number(productId.productId);
+    // } else {
+    //   // Convert to number if it's a string
+    //   productId = Number(productId);
+    // }
+
+    // // Check if productId is a valid number
+    // if (isNaN(productId)) {
+    //   throw new Error("Invalid productId");
+    // }
+
+    // console.log(productId as number);
+    // const productFilter = await this.db
+    //   .select()
+    //   .from(product)
+    //   .where(eq(product.id, productId));
+
+    const productFilter = await this.db
+      .select({
+        // Selecting the product fields
+        productId: product.id,
+        productName: product.productName,
+        productDescription: product.productDescription,
+        price: product.price,
+        discountPrice: product.discountPrice,
+        discountPercentage: product.discountPercentage,
+        quantity: product.quantity,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+        // Selecting fields from related tables
+        productImageId: productImages.id,
+        productImageUrl: productImages.imageUrl,
+        productTypeName: productType.type,
+        commentId: comment.id,
+        commentContent: comment.content,
+
+        // feedbackId: feedback.id,
+        // feedbackContent: feedback.content,
+        // feedbackUserId: feedback.userId,
+        // feedbackProductId: feedback.productId,
+      })
+      .from(product)
+      // Join related tables
+      .leftJoin(productImages, eq(productImages.productId, product.id)) // 1-to-many relation (productImages)
+      .leftJoin(productType, eq(productType.id, product.productTypeId)) // 1-to-1 relation (productType)
+      .leftJoin(comment, eq(comment.productId, product.id)) // 1-to-many relation (comments)
+      // .leftJoin(feedback, eq(feedback.productId, product.id)) // 1-to-many relation (feedback)
+      .where(eq(product.id, productId));
+
+    console.log({ productFilter });
+
+    if (!productFilter) {
+      return null; // Handle case where no product is found
+    }
+
+    const getProductOrder = productFilter[0];
+
+    const productDetail = {
+      productId: getProductOrder.productId,
+      productName: getProductOrder.productName,
+      description: getProductOrder.productDescription,
+      price: getProductOrder.price,
+      discountPrice: getProductOrder.discountPrice,
+      discountPercentage: getProductOrder.discountPercentage,
+      quantity: getProductOrder.quantity,
+      createdAt: getProductOrder.createdAt,
+      updatedAt: getProductOrder.updatedAt,
+      productImages: productFilter
+        .map((image) => ({
+          id: image.productImageId,
+          imageUrl: image.productImageUrl,
+        }))
+        .filter((img) => img.id !== null), // Filter out null images
+      productType: productFilter[0].productTypeName
+        ? { type: productFilter[0].productTypeName }
+        : undefined,
+      comments: productFilter
+        .map((comment) => ({
+          id: comment.commentId,
+          content: comment.commentContent,
+        }))
+        .filter((c) => c.id !== null), // Filter out null comments
+      // feedback: productFilter
+      //   .map((feedback) => ({
+      //     id: feedback.feedbackId,
+      //     content: feedback.feedbackContent,
+      //     userId: feedback.feedbackUserId,
+      //     productId: feedback.feedbackProductId,
+      //   }))
+      //   .filter((f) => f.id !== null), // Filter out null feedback
+    };
+
+    console.log(productDetail);
+
+    return productDetail;
+  }
+
+  // * createProduct
   async createProduct(insertProductProps: newProductProps) {
     // insertProductProps.productId
 
@@ -102,10 +207,21 @@ export class ProductsService {
     console.log({ newProductImages });
 
     return {
-      message: 'Product created successfully',
+      message: "Product created successfully",
       productId,
       newProduct: newProduct[0].productName,
       productImages: newProductImages[0],
+    };
+  }
+
+  async deleteProduct(productId: number) {
+    const deleteProduct = await this.db
+      .delete(product)
+      .where(eq(product.id, productId))
+      .returning();
+
+    return {
+      message: `Deleted ${deleteProduct[0].productName} successfully `,
     };
   }
 }

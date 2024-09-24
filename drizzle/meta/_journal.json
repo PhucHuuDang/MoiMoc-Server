@@ -267,6 +267,13 @@
       "when": 1727055498881,
       "tag": "0037_luxuriant_christian_walker",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1727157369563,
+      "tag": "0038_strong_ogun",
+      "breakpoints": true
     }
   ]
 }
