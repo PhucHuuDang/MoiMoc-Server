@@ -19,6 +19,7 @@ import { custom } from "./custom.schema";
 import {
   InsertProductImagesProps,
   SelectProductImagesProps,
+  UpdateProductImagesProps,
   productImages,
 } from "./product-images.schema";
 import { SelectProductTypeProps, productType } from "./product-type.schema";
@@ -78,5 +79,12 @@ export type newProductProps = ProductShapeType & {
   discountPrice?: number;
 } & {
   imageUrl: string[];
+  productTypeId: number;
+};
+export type UpdateProductProps = ProductShapeType & {
+  discountPercentage?: number;
+  discountPrice?: number;
+} & {
+  images: UpdateProductImagesProps[];
   productTypeId: number;
 };

@@ -13,6 +13,7 @@ import {
   SelectProductProps,
   newProductProps,
   product,
+  UpdateProductProps,
 } from "src/drizzle/schema/product.schema";
 import { ProductImagesService } from "src/product-images/product-images.service";
 import { DrizzleDbType } from "types/drizzle";
@@ -58,24 +59,6 @@ export class ProductsService {
   }
 
   async findDetailProduct(productId: number) {
-    // if (typeof productId === "object" && productId.productId) {
-    //   productId = Number(productId.productId);
-    // } else {
-    //   // Convert to number if it's a string
-    //   productId = Number(productId);
-    // }
-
-    // // Check if productId is a valid number
-    // if (isNaN(productId)) {
-    //   throw new Error("Invalid productId");
-    // }
-
-    // console.log(productId as number);
-    // const productFilter = await this.db
-    //   .select()
-    //   .from(product)
-    //   .where(eq(product.id, productId));
-
     const productFilter = await this.db
       .select({
         // Selecting the product fields
@@ -222,6 +205,69 @@ export class ProductsService {
 
     return {
       message: `Deleted ${deleteProduct[0].productName} successfully `,
+    };
+  }
+
+  async updateProduct(productId: number, updateProduct: UpdateProductProps) {
+    console.log({ updateProduct });
+
+    const { images, price, ...props } = updateProduct;
+
+    const priceAsNumber = parseFloat(price);
+
+    const calculateDiscountPrice = props.discountPercentage
+      ? priceAsNumber - (priceAsNumber * props.discountPercentage) / 100
+      : undefined;
+
+    const insertValues: any = {
+      ...props,
+      price: priceAsNumber,
+    };
+
+    if (calculateDiscountPrice !== undefined) {
+      insertValues.discountPrice = calculateDiscountPrice;
+    }
+
+    console.log({ calculateDiscountPrice });
+
+    const existingProductImages =
+      await this.productImages.findImagesByProductId(productId);
+
+    const updateProductDb = await this.db
+      .update(product)
+      .set(insertValues)
+      .where(eq(product.id, productId))
+      .returning();
+
+    // const productId = newProduct[0].productId;
+
+    const transformedImages = images.map((url, index) => ({
+      imageId: existingProductImages[index]?.id,
+      productId: url.productId,
+      imageUrl: url.imageUrl,
+    }));
+
+    console.log({ transformedImages });
+
+    // const newProductImages = await this.db
+    //   .insert(productImages)
+    //   .values({
+    //     transformedImages,
+    //   })
+    //   .returning();
+
+    const updateProductImages = await this.productImages.updateProductImages(
+      productId,
+      transformedImages
+    );
+
+    console.log({ updateProductImages });
+
+    return {
+      message: `Updated ${updateProductDb[0].productName} successfully`,
+      productId,
+      updateProduct: updateProductDb[0].productName,
+      productImages: updateProductImages[0],
     };
   }
 }

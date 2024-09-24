@@ -6,12 +6,12 @@ import {
   Patch,
   Param,
   Delete,
-} from '@nestjs/common';
-import { ProductImagesService } from './product-images.service';
-import { CreateProductImageDto } from './dto/create-product-image.dto';
-import { UpdateProductImageDto } from './dto/update-product-image.dto';
+} from "@nestjs/common";
+import { ProductImagesService } from "./product-images.service";
+import { CreateProductImageDto } from "./dto/create-product-image.dto";
+import { UpdateProductImageDto } from "./dto/update-product-image.dto";
 
-@Controller('product-images')
+@Controller("product-images")
 export class ProductImagesController {
   constructor(private readonly imagesProductService: ProductImagesService) {}
 
@@ -25,21 +25,21 @@ export class ProductImagesController {
     return this.imagesProductService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get(":id")
+  findOne(@Param("id") id: string) {
     return this.imagesProductService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Patch(":id")
   update(
-    @Param('id') id: string,
-    @Body() updateProductImageDto: UpdateProductImageDto,
+    @Param("id") id: string,
+    @Body() updateProductImageDto: UpdateProductImageDto
   ) {
-    return this.imagesProductService.update(+id, updateProductImageDto);
+    // return this.imagesProductService.update(+id, updateProductImageDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.imagesProductService.remove(+id);
+  @Delete(":id")
+  remove(@Param("id") id: string) {
+    // return this.imagesProductService.remove(+id);
   }
 }
