@@ -10,6 +10,10 @@ import { ProductImagesService } from "src/product-images/product-images.service"
 @Module({
   controllers: [CommentsController],
   providers: [CommentsService, ProductsService, ProductImagesService],
-  imports: [DrizzleModule, ProductsModule, ProductImagesModule],
+  imports: [
+    DrizzleModule,
+    forwardRef(() => ProductsModule),
+    ProductImagesModule,
+  ],
 })
 export class CommentsModule {}

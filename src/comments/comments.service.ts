@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from "@nestjs/common";
 import { DRIZZLE } from "src/drizzle/drizzle.module";
 import { DrizzleDbType } from "types/drizzle";
 import { InsertCommentProps, comment } from "src/drizzle/schema/comment.schema";
@@ -6,11 +12,16 @@ import { eq } from "drizzle-orm";
 import { product } from "src/drizzle/schema/product.schema";
 import { user } from "src/drizzle/schema/user.schema";
 import { ProductsService } from "src/products/products.service";
+import { REQUEST } from "@nestjs/core";
 
 @Injectable()
 export class CommentsService {
   constructor(
     @Inject(DRIZZLE) private readonly db: DrizzleDbType,
+
+    //* these 2 way handle circular dependency
+    // @Inject(forwardRef(() => ProductsService))
+    @Inject(REQUEST)
     private readonly productService: ProductsService
   ) {}
 
@@ -86,6 +97,15 @@ export class CommentsService {
     const detailComment = getOneComment[0];
 
     return detailComment;
+  }
+
+  async findCommentByProductId(productId: number) {
+    const comments = await this.db
+      .select()
+      .from(comment)
+      .where(eq(comment.productId, productId));
+
+    return comments;
   }
 
   async updateComment(id: number, updateCommentValues: InsertCommentProps) {

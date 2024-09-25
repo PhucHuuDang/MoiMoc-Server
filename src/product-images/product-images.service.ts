@@ -44,10 +44,12 @@ export class ProductImagesService {
   }
 
   async findImagesByProductId(productId: number) {
-    return await this.db
+    const productImagesDetail = await this.db
       .select()
       .from(productImages)
       .where(eq(productImages.productId, productId));
+
+    return productImagesDetail;
   }
 
   async updateProductImages(

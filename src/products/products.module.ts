@@ -5,10 +5,16 @@ import { ProductImagesService } from "src/product-images/product-images.service"
 import { ProductImagesModule } from "src/product-images/product-images.module";
 import { DrizzleModule } from "src/drizzle/drizzle.module";
 import { CommentsModule } from "src/comments/comments.module";
+import { CommentsService } from "src/comments/comments.service";
 
 @Module({
   controllers: [ProductsController],
-  providers: [ProductsService, ProductImagesService],
-  imports: [ProductImagesModule, DrizzleModule],
+  providers: [ProductsService, ProductImagesService, CommentsService],
+  imports: [
+    ProductImagesModule,
+    forwardRef(() => CommentsModule),
+    // CommentsModule,
+    DrizzleModule,
+  ],
 })
 export class ProductsModule {}

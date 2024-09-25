@@ -1,5 +1,7 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, forwardRef } from "@nestjs/common";
+import { REQUEST } from "@nestjs/core";
 import { eq } from "drizzle-orm";
+import { CommentsService } from "src/comments/comments.service";
 import { DRIZZLE } from "src/drizzle/drizzle.module";
 import { comment } from "src/drizzle/schema/comment.schema";
 import { feedback } from "src/drizzle/schema/feedback.schema";
@@ -9,7 +11,6 @@ import {
 } from "src/drizzle/schema/product-images.schema";
 import { productType } from "src/drizzle/schema/product-type.schema";
 import {
-  ProductShapeType,
   SelectProductProps,
   newProductProps,
   product,
@@ -22,7 +23,12 @@ import { DrizzleDbType } from "types/drizzle";
 export class ProductsService {
   constructor(
     @Inject(DRIZZLE) private readonly db: DrizzleDbType,
-    private readonly productImages: ProductImagesService
+    private readonly productImagesService: ProductImagesService,
+
+    //* these 2 way handle circular dependency
+    // @Inject(forwardRef(() => CommentsService))
+    // @Inject(REQUEST)
+    private readonly commentService: CommentsService
   ) {}
 
   // * find
@@ -61,7 +67,6 @@ export class ProductsService {
   async findDetailProduct(productId: number) {
     const productFilter = await this.db
       .select({
-        // Selecting the product fields
         productId: product.id,
         productName: product.productName,
         productDescription: product.productDescription,
@@ -71,25 +76,10 @@ export class ProductsService {
         quantity: product.quantity,
         createdAt: product.createdAt,
         updatedAt: product.updatedAt,
-        // Selecting fields from related tables
-        productImageId: productImages.id,
-        productImageUrl: productImages.imageUrl,
         productTypeName: productType.type,
-
-        commentId: comment.id,
-        commentContent: comment.content,
-
-        // feedbackId: feedback.id,
-        // feedbackContent: feedback.content,
-        // feedbackUserId: feedback.userId,
-        // feedbackProductId: feedback.productId,
       })
       .from(product)
-      // Join related tables
-      .leftJoin(productImages, eq(productImages.productId, product.id)) // 1-to-many relation (productImages)
-      .leftJoin(productType, eq(productType.id, product.productTypeId)) // 1-to-1 relation (productType)
-      .leftJoin(comment, eq(comment.productId, product.id)) // 1-to-many relation (comments)
-      // .leftJoin(feedback, eq(feedback.productId, product.id)) // 1-to-many relation (feedback)
+      .leftJoin(productType, eq(productType.id, product.productTypeId))
       .where(eq(product.id, productId))
       .limit(1);
 
@@ -99,36 +89,45 @@ export class ProductsService {
       return null; // Handle case where no product is found
     }
 
-    const getProductOrder = productFilter[0];
+    const productDetailData = productFilter[0];
+
+    const productImages =
+      await this.productImagesService.findImagesByProductId(productId);
+
+    const commentsProductDetail =
+      await this.commentService.findCommentByProductId(productId);
 
     const productDetail = {
-      productId: getProductOrder.productId,
-      productName: getProductOrder.productName,
-      description: getProductOrder.productDescription,
-      price: getProductOrder.price,
-      discountPrice: getProductOrder.discountPrice,
-      discountPercentage: getProductOrder.discountPercentage,
-      quantity: getProductOrder.quantity,
-      createdAt: getProductOrder.createdAt,
-      updatedAt: getProductOrder.updatedAt,
-      productImages: productFilter
-        .map((image) => ({
-          id: image.productImageId,
-          imageUrl: image.productImageUrl,
-        }))
-        .filter((img) => img.id !== null), // Filter out null images
-      productType: productFilter[0].productTypeName
-        ? { type: productFilter[0].productTypeName }
-        : undefined,
+      productId: productDetailData.productId,
+      productName: productDetailData.productName,
+      description: productDetailData.productDescription,
+      price: productDetailData.price,
+      discountPrice: productDetailData.discountPrice,
+      discountPercentage: productDetailData.discountPercentage,
+      quantity: productDetailData.quantity,
+      createdAt: productDetailData.createdAt,
+      updatedAt: productDetailData.updatedAt,
+      productImages,
+      comments: commentsProductDetail,
 
-      comments: Array.from(
-        new Map(
-          productFilter.map((comment) => [
-            comment.commentId,
-            { id: comment.commentId, content: comment.commentContent },
-          ])
-        ).values()
-      ),
+      // productImages: productFilter
+      //   .map((image) => ({
+      //     id: image.productImageId,
+      //     imageUrl: image.productImageUrl,
+      //   }))
+      //   .filter((img) => img.id !== null), // Filter out null images
+      // productType: productFilter[0].productTypeName
+      //   ? { type: productFilter[0].productTypeName }
+      //   : undefined,
+
+      // comments: Array.from(
+      //   new Map(
+      //     productFilter.map((comment) => [
+      //       comment.commentId,
+      //       { id: comment.commentId, content: comment.commentContent },
+      //     ])
+      //   ).values()
+      // ),
 
       // comments: productFilter
       //   .map((comment) => ({
@@ -199,7 +198,7 @@ export class ProductsService {
     //   })
     //   .returning();
     const newProductImages =
-      await this.productImages.addProductImages(transformedImages);
+      await this.productImagesService.addProductImages(transformedImages);
 
     console.log({ newProductImages });
 
@@ -245,7 +244,7 @@ export class ProductsService {
     console.log({ calculateDiscountPrice });
 
     const existingProductImages =
-      await this.productImages.findImagesByProductId(productId);
+      await this.productImagesService.findImagesByProductId(productId);
 
     const updateProductDb = await this.db
       .update(product)
@@ -270,10 +269,11 @@ export class ProductsService {
     //   })
     //   .returning();
 
-    const updateProductImages = await this.productImages.updateProductImages(
-      productId,
-      transformedImages
-    );
+    const updateProductImages =
+      await this.productImagesService.updateProductImages(
+        productId,
+        transformedImages
+      );
 
     console.log({ updateProductImages });
 
