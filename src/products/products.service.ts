@@ -75,6 +75,7 @@ export class ProductsService {
         productImageId: productImages.id,
         productImageUrl: productImages.imageUrl,
         productTypeName: productType.type,
+
         commentId: comment.id,
         commentContent: comment.content,
 
@@ -89,7 +90,8 @@ export class ProductsService {
       .leftJoin(productType, eq(productType.id, product.productTypeId)) // 1-to-1 relation (productType)
       .leftJoin(comment, eq(comment.productId, product.id)) // 1-to-many relation (comments)
       // .leftJoin(feedback, eq(feedback.productId, product.id)) // 1-to-many relation (feedback)
-      .where(eq(product.id, productId));
+      .where(eq(product.id, productId))
+      .limit(1);
 
     console.log({ productFilter });
 
@@ -118,12 +120,24 @@ export class ProductsService {
       productType: productFilter[0].productTypeName
         ? { type: productFilter[0].productTypeName }
         : undefined,
-      comments: productFilter
-        .map((comment) => ({
-          id: comment.commentId,
-          content: comment.commentContent,
-        }))
-        .filter((c) => c.id !== null), // Filter out null comments
+
+      comments: Array.from(
+        new Map(
+          productFilter.map((comment) => [
+            comment.commentId,
+            { id: comment.commentId, content: comment.commentContent },
+          ])
+        ).values()
+      ),
+
+      // comments: productFilter
+      //   .map((comment) => ({
+      //     id: comment.commentId,
+      //     content: comment.commentContent,
+      //   }))
+      //   .filter((c) => c.id !== null), // Filter out null comments
+
+      // testComments: productFilter[0].co
       // feedback: productFilter
       //   .map((feedback) => ({
       //     id: feedback.feedbackId,

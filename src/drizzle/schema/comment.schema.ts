@@ -5,25 +5,26 @@ import {
   serial,
   text,
   timestamp,
-} from 'drizzle-orm/pg-core';
-import { InferInsertModel, relations } from 'drizzle-orm';
+} from "drizzle-orm/pg-core";
+import { InferInsertModel, relations } from "drizzle-orm";
 
-import { user } from './user.schema';
-import { product } from './product.schema';
+import { user } from "./user.schema";
+import { product } from "./product.schema";
 
-export const comment = pgTable('comment', {
-  id: serial('id').primaryKey(),
-  content: text('content').notNull(),
-  rating: numeric('rating').default(undefined),
-  createdAt: timestamp('createdAt', { mode: 'string' }).notNull().defaultNow(),
-  updatedAt: timestamp('updatedAt', { mode: 'string' }).notNull().defaultNow(),
+export const comment = pgTable("comment", {
+  id: serial("id").primaryKey(),
+  content: text("content").notNull(),
+  rating: numeric("rating"),
 
-  userId: integer('userId')
-    .references(() => user.id, { onDelete: 'cascade' })
+  createdAt: timestamp("createdAt", { mode: "string" }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { mode: "string" }).notNull().defaultNow(),
+
+  userId: integer("userId")
+    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" })
     .notNull(),
 
-  productId: integer('productId')
-    .references(() => product.id, { onDelete: 'cascade' })
+  productId: integer("productId")
+    .references(() => product.id, { onDelete: "cascade", onUpdate: "cascade" })
     .notNull(),
 });
 

@@ -281,6 +281,13 @@
       "when": 1727167592101,
       "tag": "0039_orange_karma",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1727247541363,
+      "tag": "0040_blue_bucky",
+      "breakpoints": true
     }
   ]
 }

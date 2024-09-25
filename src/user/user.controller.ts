@@ -7,13 +7,13 @@ import {
   Param,
   Delete,
   Put,
-} from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { NewUser } from '../drizzle/schema/user.schema';
+} from "@nestjs/common";
+import { UserService } from "./user.service";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { NewUser } from "../drizzle/schema/user.schema";
 
-@Controller('user')
+@Controller("users")
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -28,23 +28,23 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get(":id")
+  findOne(@Param("id") id: string) {
     return this.userService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  @Patch(":id")
+  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);
   }
 
-  @Put(':id')
-  updateUser(@Param('id') id: number, @Body() updateUser: any) {
-    return 'This action updates a #${id} user';
+  @Put(":id")
+  updateUser(@Param("id") id: number, @Body() updateUser: any) {
+    return "This action updates a #${id} user";
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Delete(":id")
+  remove(@Param("id") id: string) {
     return this.userService.remove(+id);
   }
 }
