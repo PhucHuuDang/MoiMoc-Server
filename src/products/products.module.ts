@@ -11,10 +11,9 @@ import { CommentsService } from "src/comments/comments.service";
   controllers: [ProductsController],
   providers: [ProductsService, ProductImagesService, CommentsService],
   imports: [
+    DrizzleModule,
     ProductImagesModule,
     forwardRef(() => CommentsModule),
-    // CommentsModule,
-    DrizzleModule,
   ],
 })
 export class ProductsModule {}

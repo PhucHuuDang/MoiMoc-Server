@@ -20,8 +20,9 @@ export class CommentsService {
     @Inject(DRIZZLE) private readonly db: DrizzleDbType,
 
     //* these 2 way handle circular dependency
-    // @Inject(forwardRef(() => ProductsService))
-    @Inject(REQUEST)
+
+    //* @Inject(REQUEST) ==> we should not use this way
+    @Inject(forwardRef(() => ProductsService))
     private readonly productService: ProductsService
   ) {}
 

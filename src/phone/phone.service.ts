@@ -8,7 +8,7 @@ import { NewPhoneNumber, phones } from 'src/drizzle/schema/phones.schema';
 @Injectable()
 export class PhoneService {
   constructor(@Inject(DRIZZLE) private readonly db: DrizzleDbType) {
-    console.log('DRIZZLE injected:', this.db);
+    // console.log('DRIZZLE injected:', this.db);
     // console.log({ DRIZZLE });
   }
 

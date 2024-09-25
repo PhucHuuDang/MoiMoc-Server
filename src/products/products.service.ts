@@ -25,11 +25,13 @@ export class ProductsService {
     @Inject(DRIZZLE) private readonly db: DrizzleDbType,
     private readonly productImagesService: ProductImagesService,
 
-    //* these 2 way handle circular dependency
-    // @Inject(forwardRef(() => CommentsService))
-    // @Inject(REQUEST)
+    //* these 2 way handle
+    //* @Inject(REQUEST) ==> we should not use this way
+    @Inject(forwardRef(() => CommentsService))
     private readonly commentService: CommentsService
-  ) {}
+  ) {
+    // console.log({ db });
+  }
 
   // * find
   async findAllProducts(): Promise<SelectProductProps[] | []> {
@@ -85,7 +87,7 @@ export class ProductsService {
 
     console.log({ productFilter });
 
-    if (!productFilter) {
+    if (!productFilter || productFilter.length === 0) {
       return null; // Handle case where no product is found
     }
 
