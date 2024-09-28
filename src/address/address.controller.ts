@@ -30,7 +30,7 @@ export class AddressController {
       throw new HttpException("User ID is required", HttpStatus.BAD_REQUEST);
     }
 
-    return this.addressService.findAll(+userId);
+    return this.addressService.findUserAddresses(+userId);
   }
 
   @Get(":addressId")

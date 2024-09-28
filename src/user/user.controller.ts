@@ -20,31 +20,26 @@ export class UserController {
   @Post()
   create(@Body() createUserDto: NewUser) {
     console.log({ createUserDto });
-    return this.userService.create(createUserDto);
+    return this.userService.createUser(createUserDto);
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  findAllUserWithInfo() {
+    return this.userService.findAllUserWithInfo();
   }
 
-  @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.userService.findOne(+id);
+  @Get(":userId")
+  findUserDetail(@Param("userId") userId: string) {
+    return this.userService.findUserDetail(+userId);
   }
 
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Put(":userId")
+  updateUserInfo(@Param("userId") userId: number, @Body() updateUser: any) {
+    return "This action updates a #${userId} user";
   }
 
-  @Put(":id")
-  updateUser(@Param("id") id: number, @Body() updateUser: any) {
-    return "This action updates a #${id} user";
-  }
-
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.userService.remove(+id);
+  @Delete(":userId")
+  remove(@Param("userId") userId: string) {
+    return this.userService.remove(+userId);
   }
 }

@@ -1,9 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { CreatePhoneDto } from './dto/create-phone.dto';
-import { UpdatePhoneDto } from './dto/update-phone.dto';
-import { DRIZZLE } from 'src/drizzle/drizzle.module';
-import { DrizzleDbType } from 'types/drizzle';
-import { NewPhoneNumber, phones } from 'src/drizzle/schema/phones.schema';
+import { Inject, Injectable } from "@nestjs/common";
+import { CreatePhoneDto } from "./dto/create-phone.dto";
+import { UpdatePhoneDto } from "./dto/update-phone.dto";
+import { DRIZZLE } from "src/drizzle/drizzle.module";
+import { DrizzleDbType } from "types/drizzle";
+import {
+  PhoneInsertTypes,
+  PhoneSelectTypes,
+  phones,
+} from "src/drizzle/schema/phones.schema";
+import { and, eq } from "drizzle-orm";
 
 @Injectable()
 export class PhoneService {
@@ -12,25 +17,79 @@ export class PhoneService {
     // console.log({ DRIZZLE });
   }
 
-  create(createPhoneDto: NewPhoneNumber) {
-    console.log({ createPhoneDto });
-    return this.db.insert(phones).values(createPhoneDto).returning();
+  async addPhone(createPhoneDto: PhoneInsertTypes) {
+    const addPhone = await this.db
+      .insert(phones)
+      .values(createPhoneDto)
+      .returning();
+    return {
+      message: "Phone created successfully",
+      phone: addPhone[0].phone,
+    };
   }
 
-  findAll() {
-    console.log('get all phones');
-    return this.db.query.phones.findMany();
+  async findAllPhones() {
+    const getAllPhones = await this.db.query.phones.findMany({
+      with: {
+        user: {
+          columns: {
+            id: true,
+            name: true,
+            phoneAuth: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
+    });
+
+    return getAllPhones;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} phone`;
+  async findPhonesByUserId(userId: number): Promise<PhoneSelectTypes[]> {
+    const userPhones = await this.db
+      .select()
+      .from(phones)
+      .where(eq(phones.userId, userId));
+
+    return userPhones;
   }
 
-  update(id: number, updatePhoneDto: UpdatePhoneDto) {
-    return `This action updates a #${id} phone`;
+  async findPhonesById(phoneId: number): Promise<PhoneSelectTypes[]> {
+    const userPhones = await this.db
+      .select()
+      .from(phones)
+      .where(eq(phones.id, phoneId));
+
+    return userPhones;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} phone`;
+  async updatePhone(
+    phoneId: number,
+    updatePhoneValues: PhoneInsertTypes
+  ): Promise<{ message: string; phone }> {
+    const updating = await this.db
+      .update(phones)
+      .set(updatePhoneValues)
+      .where(
+        and(eq(phones.id, phoneId), eq(phones.userId, updatePhoneValues.userId))
+      )
+      .returning();
+
+    return {
+      message: "Phone updated successfully",
+      phone: updating[0].phone,
+    };
+  }
+
+  async deletePhone(phoneId: number) {
+    const deletedPhone = await this.db
+      .delete(phones)
+      .where(and(eq(phones.id, phoneId)))
+      .returning();
+    return {
+      message: `Deleted ${deletedPhone[0].phone} successfully`,
+      phone: deletedPhone[0].phone,
+    };
   }
 }

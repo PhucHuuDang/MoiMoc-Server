@@ -6,39 +6,64 @@ import {
   Patch,
   Param,
   Delete,
-} from '@nestjs/common';
-import { PhoneService } from './phone.service';
-import { CreatePhoneDto } from './dto/create-phone.dto';
-import { UpdatePhoneDto } from './dto/update-phone.dto';
-import { NewPhoneNumber } from 'src/drizzle/schema/phones.schema';
+  HttpException,
+  HttpStatus,
+  Put,
+} from "@nestjs/common";
+import { PhoneService } from "./phone.service";
+import { PhoneInsertTypes } from "src/drizzle/schema/phones.schema";
 
-@Controller('phone')
+@Controller("phone")
 export class PhoneController {
   constructor(private readonly phoneService: PhoneService) {}
 
   @Post()
-  create(@Body() createPhoneDto: NewPhoneNumber) {
-    console.log({ createPhoneDto });
-    return this.phoneService.create(createPhoneDto);
+  addPhone(@Body() createPhoneValues: PhoneInsertTypes) {
+    const { phone, userId } = createPhoneValues;
+
+    if (!phone || !userId) {
+      throw new HttpException(
+        "Phone and User ID are required",
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    console.log({ createPhoneValues });
+    return this.phoneService.addPhone(createPhoneValues);
   }
 
   @Get()
-  findAll() {
-    return this.phoneService.findAll();
+  findAllPhones() {
+    return this.phoneService.findAllPhones();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.phoneService.findOne(+id);
+  @Get(":phoneId")
+  findPhonesById(@Param("phoneId") phoneId: string) {
+    return this.phoneService.findPhonesById(+phoneId);
+  }
+  @Get("/user/:userId")
+  findPhonesByUserId(@Param("userId") userId: string) {
+    return this.phoneService.findPhonesByUserId(+userId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePhoneDto: UpdatePhoneDto) {
-    return this.phoneService.update(+id, updatePhoneDto);
+  @Put(":id")
+  update(@Param("id") id: string, @Body() updatePhoneDto: PhoneInsertTypes) {
+    const { phone, userId } = updatePhoneDto;
+
+    if (!phone || !userId) {
+      throw new HttpException(
+        "Phone and User ID are required",
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    const updatedPhone = this.phoneService.updatePhone(+id, updatePhoneDto);
+    return updatedPhone;
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.phoneService.remove(+id);
+  @Delete(":id")
+  PhoneInsertTypes(@Param("id") id: string) {
+    const deletedPhone = this.phoneService.deletePhone(+id);
+    return deletedPhone;
   }
 }

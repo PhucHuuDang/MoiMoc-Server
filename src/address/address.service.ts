@@ -23,7 +23,7 @@ export class AddressService {
     };
   }
 
-  async findAll(userId: number) {
+  async findUserAddresses(userId: number) {
     const addresses = await this.db
       .select()
       .from(address)
