@@ -9,6 +9,7 @@ import { ProductsModule } from './products/products.module';
 import { ProductImagesModule } from './product-images/product-images.module';
 import { ProductCategoryModule } from './product-category/product-category.module';
 import { CommentsModule } from './comments/comments.module';
+import { AddressModule } from './address/address.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CommentsModule } from './comments/comments.module';
     ProductImagesModule,
     ProductCategoryModule,
     CommentsModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService],

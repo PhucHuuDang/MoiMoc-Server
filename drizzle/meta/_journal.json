@@ -288,6 +288,13 @@
       "when": 1727247541363,
       "tag": "0040_blue_bucky",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1727456081757,
+      "tag": "0041_colorful_katie_power",
+      "breakpoints": true
     }
   ]
 }
