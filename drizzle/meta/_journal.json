@@ -295,6 +295,20 @@
       "when": 1727456081757,
       "tag": "0041_colorful_katie_power",
       "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1727516649088,
+      "tag": "0042_nostalgic_kid_colt",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1727516987568,
+      "tag": "0043_flippant_zuras",
+      "breakpoints": true
     }
   ]
 }

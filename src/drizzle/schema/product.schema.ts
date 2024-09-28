@@ -25,6 +25,7 @@ import {
 import { SelectProductTypeProps, productType } from "./product-type.schema";
 import { orderProducts } from "./order-products";
 import { feedback } from "./feedback.schema";
+import { ingredients } from "./ingredients.schema";
 
 export const product = pgTable("product", {
   id: serial("id").primaryKey(),
@@ -37,6 +38,8 @@ export const product = pgTable("product", {
   ),
   discountPercentage: numeric("discountPercentage").default(undefined),
   quantity: numeric("quantity").notNull(),
+  usage: text("usage").notNull(),
+  details: text("details").notNull(),
 
   productTypeId: integer("productTypeId")
     .references(() => productType.id, { onDelete: "cascade" })
@@ -60,6 +63,8 @@ export const productRelations = relations(product, ({ one, many }) => ({
   custom: many(custom),
 
   feedback: many(feedback),
+
+  ingredients: many(ingredients),
 }));
 
 export const productZod = createInsertSchema(product);
