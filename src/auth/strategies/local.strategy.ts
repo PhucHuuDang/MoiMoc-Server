@@ -15,6 +15,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
   // * this will be used by the LocalStrategy
   validate(phoneAuth: string, password: string) {
+    //* this return will be append it to Request.user
     return this.authService.validateUser(phoneAuth, password);
   }
 }

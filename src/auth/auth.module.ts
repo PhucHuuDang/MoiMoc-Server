@@ -13,6 +13,8 @@ import { JwtModule } from "@nestjs/jwt";
 import jwtConfig from "./config/jwt.config";
 import { ConfigModule } from "@nestjs/config";
 import { JwtStrategy } from "./strategies/jwt.strategy";
+import refreshConfig from "./config/refresh.config";
+import { RefreshJwtStrategy } from "./strategies/refresh-token.strategy";
 
 @Module({
   controllers: [AuthController],
@@ -23,6 +25,7 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
     AddressService,
     LocalStrategy,
     JwtStrategy,
+    RefreshJwtStrategy,
   ],
   imports: [
     DrizzleModule,
@@ -31,6 +34,7 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
     AddressModule,
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
+    ConfigModule.forFeature(refreshConfig),
   ],
 })
 export class AuthModule {}

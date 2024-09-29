@@ -5,19 +5,25 @@ import jwtConfig from "../config/jwt.config";
 import { ConfigType } from "@nestjs/config";
 import { AuthJwtPayload } from "../types/auth-jwtPayload";
 import { Inject, Injectable } from "@nestjs/common";
+import refreshConfig from "../config/refresh.config";
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class RefreshJwtStrategy extends PassportStrategy(
+  Strategy,
+  "refresh-jwt"
+) {
   constructor(
     private authService: AuthService,
-    @Inject(jwtConfig.KEY)
-    private jwtConfiguration: ConfigType<typeof jwtConfig>
+    //* refresh-jwt
+    @Inject(refreshConfig.KEY)
+    private refreshJwtConfiguration: ConfigType<typeof refreshConfig>
   ) {
     super({
       //* expect the token to be passed in the Authorization header with the Bearer scheme
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: jwtConfiguration.secret,
+      secretOrKey: refreshJwtConfiguration.secret,
       ignoreExpiration: false,
+      // passReqToCallback: true,
     });
   }
 
