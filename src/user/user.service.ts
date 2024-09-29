@@ -4,7 +4,7 @@ import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { DrizzleDbType } from "types/drizzle";
-import { NewUser, user } from "src/drizzle/schema/user.schema";
+import { NewUser, UserSelectTypes, user } from "src/drizzle/schema/user.schema";
 import { DRIZZLE } from "src/drizzle/drizzle.module";
 import { phones } from "src/drizzle/schema/phones.schema";
 import { PhoneService } from "src/phone/phone.service";
@@ -100,6 +100,15 @@ export class UserService {
     };
 
     return userDetailWithInfo;
+  }
+
+  async findUserByPhoneAuth(phoneAuth: string): Promise<UserSelectTypes> {
+    const getUserByPhoneAuth = await this.db
+      .select()
+      .from(user)
+      .where(eq(user.phoneAuth, phoneAuth));
+
+    return getUserByPhoneAuth[0];
   }
 
   async update(userId: number, updateUserDto: UpdateUserDto) {

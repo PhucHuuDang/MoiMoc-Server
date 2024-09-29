@@ -7,5 +7,6 @@ import { DrizzleModule } from "src/drizzle/drizzle.module";
   controllers: [AddressController],
   providers: [AddressService],
   imports: [DrizzleModule],
+  exports: [AddressService],
 })
 export class AddressModule {}

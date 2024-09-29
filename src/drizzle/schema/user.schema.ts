@@ -54,5 +54,7 @@ export type NewUser = typeof user.$inferInsert & {
   email?: string;
 };
 
+export type UserSelectTypes = InferSelectModel<typeof user>;
+
 // export type UserShapeType = z.infer<typeof userZod>;
 // export type UserShapeType = InferSelectModel<typeof user>;

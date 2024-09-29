@@ -7,11 +7,14 @@ import {
   Param,
   Delete,
   Put,
+  UseGuards,
+  Req,
 } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { NewUser } from "../drizzle/schema/user.schema";
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth/jwt-auth.guard";
 
 @Controller("users")
 export class UserController {
@@ -23,6 +26,7 @@ export class UserController {
     return this.userService.createUser(createUserDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAllUserWithInfo() {
     return this.userService.findAllUserWithInfo();
@@ -30,6 +34,8 @@ export class UserController {
 
   @Get(":userId")
   findUserDetail(@Param("userId") userId: string) {
+    // const userId = req.user.id;
+
     return this.userService.findUserDetail(+userId);
   }
 
@@ -38,8 +44,11 @@ export class UserController {
     return "This action updates a #${userId} user";
   }
 
-  @Delete(":userId")
-  remove(@Param("userId") userId: string) {
-    return this.userService.remove(+userId);
+  @UseGuards(JwtAuthGuard)
+  @Delete()
+  deleteUser(@Req() req: any) {
+    const userId = req.user.id;
+
+    return this.userService.remove(userId);
   }
 }
