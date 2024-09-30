@@ -6,7 +6,7 @@ import { UserService } from "src/user/user.service";
 import { DrizzleDbType } from "types/drizzle";
 import { JwtService } from "@nestjs/jwt";
 import { AuthJwtPayload } from "./types/auth-jwtPayload";
-import { UserSelectTypes } from "src/drizzle/schema/user.schema";
+import { NewUser, UserSelectTypes } from "src/drizzle/schema/user.schema";
 import { ConfigType } from "@nestjs/config";
 import refreshConfig from "./config/refresh.config";
 
@@ -19,7 +19,7 @@ export class AuthService {
     @Inject(refreshConfig.KEY)
     private refreshConfiguration: ConfigType<typeof refreshConfig>
   ) {
-    console.log(refreshConfig.KEY); //*refresh-jwt
+    //console.log(refreshConfig.KEY); //*refresh-jwt
   }
 
   // * this will be used by the LocalStrategy
@@ -35,8 +35,10 @@ export class AuthService {
     return user;
   }
 
-  async register() {
-    return "";
+  async register(createUserValues: NewUser) {
+    const registerUser = await this.userService.createUser(createUserValues);
+
+    return registerUser;
   }
 
   async hashingData(userData: UserSelectTypes) {

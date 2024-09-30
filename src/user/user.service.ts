@@ -23,46 +23,66 @@ export class UserService {
     // console.log('DRIZZLE injected:', this.db);
   }
 
-  async createUser(createUserDto: NewUser) {
-    console.log({ createUserDto });
+  async createUser(createUserValues: NewUser) {
+    try {
+      console.log({ createUserValues });
 
-    const { phoneNumber, email, name, password, phoneAuth } = createUserDto;
+      const { phoneNumber, email, name, password, phoneAuth } =
+        createUserValues;
 
-    const hashPassword = await bcrypt.hash(password, saltOrRounds);
+      const hashPassword = await bcrypt.hash(password, saltOrRounds);
 
-    console.log({ hashPassword });
+      console.log({ hashPassword });
 
-    const insertDataUser = await this.db
-      .insert(user)
-      .values({
-        name,
-        ...(email && { email }),
-        phoneAuth,
-        password: hashPassword,
-      })
-      .returning({ userId: user.id });
+      const insertDataUser = await this.db
+        .insert(user)
+        .values({
+          name,
+          ...(email && { email }),
+          phoneAuth,
+          password: hashPassword,
+        })
+        .returning({ userId: user.id });
 
-    console.log({ insertDataUser });
+      console.log({ insertDataUser });
 
-    const userId = insertDataUser[0].userId;
+      const userId = insertDataUser[0].userId;
 
+      // const insertPhones = await this.db
+      //   .insert(phones)
+      //   .values({
+      //     userId: userId,
+      //     phone: phoneNumber,
+      //   })
+      //   .returning();
+
+      // console.log({ insertPhones });
+
+      // return {
+      //   user: insertDataUser[0],
+      //   phone: insertPhones,
+      // };
+      return {
+        user: insertDataUser[0].userId,
+        message: "User created successfully",
+      };
+    } catch (error) {
+      console.log({ error });
+    }
+  }
+
+  async addPhoneToUser(userId: number, phone: string) {
     const insertPhones = await this.db
       .insert(phones)
       .values({
-        userId: userId,
-        phone: phoneNumber,
+        userId,
+        phone,
       })
       .returning();
 
-    // console.log({ insertPhones });
-
-    // return {
-    //   user: insertDataUser[0],
-    //   phone: insertPhones,
-    // };
     return {
-      user: insertDataUser[0].userId,
-      message: "User created successfully",
+      message: "Added phone to user successfully",
+      phone: insertPhones[0],
     };
   }
 

@@ -50,7 +50,7 @@ export const userZod = createInsertSchema(user, {
 });
 
 export type NewUser = typeof user.$inferInsert & {
-  phoneNumber: string;
+  phoneNumber?: string;
   email?: string;
 };
 
