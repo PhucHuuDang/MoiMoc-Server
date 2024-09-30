@@ -1,7 +1,7 @@
-import { integer, pgTable, serial } from 'drizzle-orm/pg-core';
-import { product } from './product.schema';
-import { orderDetailSchema } from './order-detail.schema';
-import { InferInsertModel, relations } from 'drizzle-orm';
+import { integer, pgTable, serial } from "drizzle-orm/pg-core";
+import { product } from "./product.schema";
+import { orderDetailSchema } from "./order-detail.schema";
+import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
 
 // // Insert into orderDetailSchema
 // const newOrderDetail = await db.insert(orderDetailSchema).values({
@@ -19,20 +19,20 @@ import { InferInsertModel, relations } from 'drizzle-orm';
 
 // await db.insert(orderProducts).values(orderProductsData);
 
-export const orderProducts = pgTable('orderProducts', {
-  id: serial('id').primaryKey(),
+export const orderProducts = pgTable("orderProducts", {
+  id: serial("id").primaryKey(),
 
   // Foreign key to the orderDetail table
-  orderDetailId: integer('orderDetailId')
+  orderDetailId: integer("orderDetailId")
     .notNull()
-    .references(() => orderDetailSchema.id, { onDelete: 'cascade' }),
+    .references(() => orderDetailSchema.id, { onDelete: "cascade" }),
 
   // Foreign key to the product table
-  productId: integer('productId')
+  productId: integer("productId")
     .notNull()
-    .references(() => product.id, { onDelete: 'cascade' }),
+    .references(() => product.id, { onDelete: "cascade" }),
 
-  quantity: integer('quantity').notNull(), // Quantity of the product in this order
+  quantity: integer("quantity").notNull(), // Quantity of the product in this order
 });
 
 export const orderProductsRelations = relations(orderProducts, ({ one }) => ({
@@ -50,3 +50,4 @@ export const orderProductsRelations = relations(orderProducts, ({ one }) => ({
 }));
 
 export type InsertOrderProductsProps = InferInsertModel<typeof orderProducts>;
+export type OrderProductSelectValues = InferSelectModel<typeof orderProducts>;
