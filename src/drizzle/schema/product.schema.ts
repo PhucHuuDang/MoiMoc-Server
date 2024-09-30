@@ -85,6 +85,7 @@ export type newProductProps = ProductShapeType & {
 } & {
   imageUrl: string[];
   productTypeId: number;
+  ingredients: number[];
 };
 export type UpdateProductProps = ProductShapeType & {
   discountPercentage?: number;

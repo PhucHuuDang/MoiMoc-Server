@@ -14,9 +14,9 @@ export const ingredients = pgTable("ingredients", {
   createdAt: timestamp("createdAt", { mode: "string" }).notNull().defaultNow(),
   updatedAt: timestamp("updatedAt", { mode: "string" }).notNull().defaultNow(),
 
-  productId: integer("productId")
-    .references(() => product.id, { onDelete: "cascade" })
-    .notNull(),
+  productId: integer("productId").references(() => product.id, {
+    onDelete: "cascade",
+  }),
 });
 
 export const ingredientsRelations = relations(ingredients, ({ one, many }) => ({

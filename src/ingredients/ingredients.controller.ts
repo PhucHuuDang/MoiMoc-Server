@@ -42,7 +42,8 @@ export class IngredientsController {
   @Put(":ingredientId")
   updateIngredient(
     @Param("ingredientId") ingredientId: string,
-    @Body() updateIngredientValues: InsertIngredientsValues
+    @Body()
+    updateIngredientValues: InsertIngredientsValues & { productId: number }
   ) {
     if (!ingredientId || !updateIngredientValues) {
       throw new HttpException(

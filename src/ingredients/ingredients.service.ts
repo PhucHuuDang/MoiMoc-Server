@@ -48,7 +48,7 @@ export class IngredientsService {
 
   async updateIngredient(
     ingredientId: number,
-    updateIngredientValues: InsertIngredientsValues
+    updateIngredientValues: InsertIngredientsValues & { productId: number }
   ): Promise<{ message: string; ingredient: string }> {
     const updatedIngredient = await this.db
       .update(ingredients)
