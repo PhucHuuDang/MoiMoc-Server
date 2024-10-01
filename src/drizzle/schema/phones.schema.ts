@@ -3,7 +3,7 @@ import { integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./user.schema";
 import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
-import { isValidPhone } from "regex-validation/phone-validation";
+import { isValidPhone } from "src/regex-validation/phone-validation";
 
 export const phones = pgTable("phones", {
   id: serial("id").primaryKey(),
