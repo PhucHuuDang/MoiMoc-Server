@@ -13,6 +13,7 @@ import { AddressModule } from "./address/address.module";
 import { IngredientsModule } from "./ingredients/ingredients.module";
 import { AuthModule } from "./auth/auth.module";
 import { StripeModule } from "./payments/stripe/stripe.module";
+import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { StripeModule } from "./payments/stripe/stripe.module";
     IngredientsModule,
     AuthModule,
     StripeModule,
+    PaymentMethodsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
