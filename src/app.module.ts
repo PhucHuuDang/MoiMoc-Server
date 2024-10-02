@@ -12,6 +12,7 @@ import { CommentsModule } from "./comments/comments.module";
 import { AddressModule } from "./address/address.module";
 import { IngredientsModule } from "./ingredients/ingredients.module";
 import { AuthModule } from "./auth/auth.module";
+import { StripeModule } from "./payments/stripe/stripe.module";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AuthModule } from "./auth/auth.module";
     AddressModule,
     IngredientsModule,
     AuthModule,
+    StripeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

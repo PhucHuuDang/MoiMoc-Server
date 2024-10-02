@@ -13,3 +13,4 @@ export * from "./product-type.schema";
 export * from "./order-products";
 export * from "./feedback.schema";
 export * from "./ingredients.schema";
+export * from "./subscription.schema";

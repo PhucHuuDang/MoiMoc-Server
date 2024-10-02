@@ -1,31 +1,32 @@
-import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
-import { user } from './user.schema';
-import { relations } from 'drizzle-orm';
-import { product } from './product.schema';
-import { paymentHistory } from './payment-history.schema';
-import { paymentMethod } from './payment-method.schema';
-import { orderProducts } from './order-products';
-import { delivery } from './delivery-method.schema';
+import { integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { user } from "./user.schema";
+import { relations } from "drizzle-orm";
+import { product } from "./product.schema";
+import { paymentHistory } from "./payment-history.schema";
+import { paymentMethod } from "./payment-method.schema";
+import { orderProducts } from "./order-products";
+import { delivery } from "./delivery-method.schema";
+import { subscription } from "./subscription.schema";
 
-export const orderDetailSchema = pgTable('orderDetail', {
-  id: serial('id').primaryKey(),
+export const orderDetailSchema = pgTable("orderDetail", {
+  id: serial("id").primaryKey(),
 
-  userId: integer('userId')
+  userId: integer("userId")
     .notNull()
     .references(() => user.id),
 
-  paymentMethodId: integer('paymentMethod')
+  paymentMethodId: integer("paymentMethodId")
     .references(() => paymentMethod.id)
     .notNull(),
 
-  deliveryMethodId: integer('deliveryMethodId')
+  deliveryMethodId: integer("deliveryMethodId")
     .references(() => delivery.id)
     .notNull(),
 
-  discountCode: text('discountCode'),
+  discountCode: text("discountCode"),
 
-  createdAt: timestamp('createdAt', { mode: 'string' }).notNull().defaultNow(),
-  updatedAt: timestamp('updatedAt', { mode: 'string' }).notNull().defaultNow(),
+  createdAt: timestamp("createdAt", { mode: "string" }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { mode: "string" }).notNull().defaultNow(),
 });
 
 export const orderDetailRelations = relations(
@@ -47,7 +48,11 @@ export const orderDetailRelations = relations(
       fields: [orderDetailSchema.paymentMethodId],
       references: [paymentMethod.id],
     }),
-  }),
+
+    subscription: one(subscription),
+  })
 );
 
 export type OrderDetailProps = typeof orderDetailSchema.$inferInsert;
+
+export type OrderDetailSelectTypes = typeof orderDetailSchema.$inferSelect;

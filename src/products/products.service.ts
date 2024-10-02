@@ -16,6 +16,7 @@ import {
   product,
   UpdateProductProps,
 } from "src/drizzle/schema/product.schema";
+import { StripeService } from "src/payments/stripe/stripe.service";
 import { ProductImagesService } from "src/product-images/product-images.service";
 import { DrizzleDbType } from "types/drizzle";
 

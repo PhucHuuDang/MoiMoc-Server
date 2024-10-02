@@ -6,6 +6,8 @@ import { ProductImagesModule } from "src/product-images/product-images.module";
 import { DrizzleModule } from "src/drizzle/drizzle.module";
 import { CommentsModule } from "src/comments/comments.module";
 import { CommentsService } from "src/comments/comments.service";
+import { StripeModule } from "src/payments/stripe/stripe.module";
+import { StripeService } from "src/payments/stripe/stripe.service";
 
 @Module({
   controllers: [ProductsController],
