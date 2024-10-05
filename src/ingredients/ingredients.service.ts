@@ -1,3 +1,4 @@
+import { ingredientsInProducts } from "./../drizzle/schema/ingredients-in-products.schema";
 import { Inject, Injectable } from "@nestjs/common";
 import { CreateIngredientDto } from "./dto/create-ingredient.dto";
 import { UpdateIngredientDto } from "./dto/update-ingredient.dto";
@@ -35,7 +36,7 @@ export class IngredientsService {
         ingredient: true,
         createdAt: true,
         updatedAt: true,
-        productId: true,
+        // ingredientsInProducts: true,
       },
     });
 
@@ -53,12 +54,7 @@ export class IngredientsService {
     const updatedIngredient = await this.db
       .update(ingredients)
       .set(updateIngredientValues)
-      .where(
-        and(
-          eq(ingredients.id, ingredientId),
-          eq(ingredients.productId, updateIngredientValues.productId)
-        )
-      )
+      .where(and(eq(ingredients.id, ingredientId)))
       .returning();
 
     return {

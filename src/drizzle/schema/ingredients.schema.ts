@@ -7,6 +7,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { product } from "./product.schema";
+import { ingredientsInProducts } from "./ingredients-in-products.schema";
 
 export const ingredients = pgTable("ingredients", {
   id: serial("id").primaryKey(),
@@ -14,16 +15,18 @@ export const ingredients = pgTable("ingredients", {
   createdAt: timestamp("createdAt", { mode: "string" }).notNull().defaultNow(),
   updatedAt: timestamp("updatedAt", { mode: "string" }).notNull().defaultNow(),
 
-  productId: integer("productId").references(() => product.id, {
-    onDelete: "cascade",
-  }),
+  // productId: integer("productId").references(() => product.id, {
+  //   onDelete: "cascade",
+  // }),
 });
 
 export const ingredientsRelations = relations(ingredients, ({ one, many }) => ({
-  product: one(product, {
-    fields: [ingredients.productId],
-    references: [product.id],
-  }),
+  ingredientsInProducts: many(ingredientsInProducts),
+
+  // product: one(product, {
+  //   fields: [ingredients.productId],
+  //   references: [product.id],
+  // }),
 }));
 
 export type InsertIngredientsValues = InferInsertModel<typeof ingredients>;

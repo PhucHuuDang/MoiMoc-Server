@@ -1,10 +1,12 @@
 import { Inject, Injectable, forwardRef } from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
-import { eq } from "drizzle-orm";
+import { SQL, eq, inArray } from "drizzle-orm";
 import { CommentsService } from "src/comments/comments.service";
 import { DRIZZLE } from "src/drizzle/drizzle.module";
 import { comment } from "src/drizzle/schema/comment.schema";
 import { feedback } from "src/drizzle/schema/feedback.schema";
+import { ingredientsInProducts } from "src/drizzle/schema/ingredients-in-products.schema";
+import { ingredients } from "src/drizzle/schema/ingredients.schema";
 import {
   InsertProductImagesProps,
   productImages,
@@ -112,42 +114,6 @@ export class ProductsService {
       updatedAt: productDetailData.updatedAt,
       productImages,
       comments: commentsProductDetail,
-
-      // productImages: productFilter
-      //   .map((image) => ({
-      //     id: image.productImageId,
-      //     imageUrl: image.productImageUrl,
-      //   }))
-      //   .filter((img) => img.id !== null), // Filter out null images
-      // productType: productFilter[0].productTypeName
-      //   ? { type: productFilter[0].productTypeName }
-      //   : undefined,
-
-      // comments: Array.from(
-      //   new Map(
-      //     productFilter.map((comment) => [
-      //       comment.commentId,
-      //       { id: comment.commentId, content: comment.commentContent },
-      //     ])
-      //   ).values()
-      // ),
-
-      // comments: productFilter
-      //   .map((comment) => ({
-      //     id: comment.commentId,
-      //     content: comment.commentContent,
-      //   }))
-      //   .filter((c) => c.id !== null), // Filter out null comments
-
-      // testComments: productFilter[0].co
-      // feedback: productFilter
-      //   .map((feedback) => ({
-      //     id: feedback.feedbackId,
-      //     content: feedback.feedbackContent,
-      //     userId: feedback.feedbackUserId,
-      //     productId: feedback.feedbackProductId,
-      //   }))
-      //   .filter((f) => f.id !== null), // Filter out null feedback
     };
 
     console.log(productDetail);
@@ -161,7 +127,12 @@ export class ProductsService {
 
     console.log({ insertProductProps });
 
-    const { imageUrl, price, ...props } = insertProductProps;
+    const {
+      imageUrl,
+      price,
+      ingredients: ingredientsId,
+      ...props
+    } = insertProductProps;
 
     const priceAsNumber = parseFloat(price);
 
@@ -192,18 +163,34 @@ export class ProductsService {
       imageUrl: url,
     }));
 
+    // find exist ingredients
+    const existingIngredients = await this.db
+      .select()
+      .from(ingredients)
+      .where(inArray(ingredients.id, ingredientsId));
+
+    console.log({ existingIngredients });
+
+    const transformedIngredients = existingIngredients.map((ingredient) => ({
+      productId, //
+      ingredientId: ingredient.id,
+    }));
+
     console.log({ transformedImages });
 
-    // const newProductImages = await this.db
-    //   .insert(productImages)
-    //   .values({
-    //     transformedImages,
-    //   })
-    //   .returning();
     const newProductImages =
       await this.productImagesService.addProductImages(transformedImages);
 
     console.log({ newProductImages });
+
+    // ingredientsInProducts
+
+    const newIngredientsInProducts = await this.db
+      .insert(ingredientsInProducts)
+      .values(transformedIngredients)
+      .returning();
+
+    console.log({ newIngredientsInProducts });
 
     return {
       message: "Product created successfully",

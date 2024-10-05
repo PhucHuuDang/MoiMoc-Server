@@ -26,6 +26,7 @@ import { SelectProductTypeProps, productType } from "./product-type.schema";
 import { orderProducts } from "./order-products";
 import { feedback } from "./feedback.schema";
 import { ingredients } from "./ingredients.schema";
+import { ingredientsInProducts } from "./ingredients-in-products.schema";
 
 export const product = pgTable("product", {
   id: serial("id").primaryKey(),
@@ -64,7 +65,9 @@ export const productRelations = relations(product, ({ one, many }) => ({
 
   feedback: many(feedback),
 
-  ingredients: many(ingredients),
+  ingredientsInProducts: many(ingredientsInProducts),
+
+  // ingredients: many(ingredients),
 }));
 
 export const productZod = createInsertSchema(product);
