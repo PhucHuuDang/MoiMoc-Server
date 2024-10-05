@@ -96,4 +96,5 @@ export type UpdateProductProps = ProductShapeType & {
 } & {
   images: UpdateProductImagesProps[];
   productTypeId: number;
+  ingredients: number[];
 };

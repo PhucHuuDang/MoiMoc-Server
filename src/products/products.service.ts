@@ -214,7 +214,12 @@ export class ProductsService {
   async updateProduct(productId: number, updateProduct: UpdateProductProps) {
     console.log({ updateProduct });
 
-    const { images, price, ...props } = updateProduct;
+    const {
+      images,
+      price,
+      ingredients: ingredientsIds,
+      ...props
+    } = updateProduct;
 
     const priceAsNumber = parseFloat(price);
 
@@ -252,12 +257,38 @@ export class ProductsService {
 
     console.log({ transformedImages });
 
-    // const newProductImages = await this.db
-    //   .insert(productImages)
-    //   .values({
-    //     transformedImages,
-    //   })
-    //   .returning();
+    const existingIngredients = await this.db
+      .select()
+      .from(ingredients)
+      .where(inArray(ingredients.id, ingredientsIds));
+
+    const existingIngredientRelations = await this.db
+      .select()
+      .from(ingredientsInProducts)
+      .where(eq(ingredientsInProducts.productId, productId));
+
+    const transformedIngredients = existingIngredients.map((ingredient) => ({
+      productId, //
+      ingredientId: ingredient.id,
+    }));
+
+    // Filter out ingredients that are already related to the product
+    const newIngredientRelations = transformedIngredients.filter(
+      (newIngredient) =>
+        !existingIngredientRelations.some(
+          (existing) => existing.ingredientId === newIngredient.ingredientId
+        )
+    );
+
+    // Insert only new ingredient relations
+    if (newIngredientRelations.length > 0) {
+      const updateIngredientsInProducts = await this.db
+        .insert(ingredientsInProducts)
+        .values(newIngredientRelations)
+        .returning();
+
+      console.log({ updateIngredientsInProducts });
+    }
 
     const updateProductImages =
       await this.productImagesService.updateProductImages(
