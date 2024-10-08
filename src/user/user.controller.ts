@@ -69,4 +69,11 @@ export class UserController {
 
     return this.userService.remove(userId);
   }
+
+  @Get(":userId/comments")
+  findCommentByUserId(@Param("userId") userId: string) {
+    const comments = this.userService.findCommentByUserId(+userId);
+
+    return comments;
+  }
 }

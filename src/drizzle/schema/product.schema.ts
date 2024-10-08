@@ -27,6 +27,7 @@ import { orderProducts } from "./order-products";
 import { feedback } from "./feedback.schema";
 import { ingredients } from "./ingredients.schema";
 import { ingredientsInProducts } from "./ingredients-in-products.schema";
+import { discussion } from "./discussion.schema";
 
 export const product = pgTable("product", {
   id: serial("id").primaryKey(),
@@ -40,6 +41,7 @@ export const product = pgTable("product", {
   discountPercentage: numeric("discountPercentage").default(undefined),
   quantity: numeric("quantity").notNull(),
   usage: text("usage").notNull(),
+  expireDate: text("expirationDate").notNull(),
   details: text("details").notNull(),
 
   productTypeId: integer("productTypeId")
@@ -57,6 +59,7 @@ export const productRelations = relations(product, ({ one, many }) => ({
     references: [productType.id],
   }),
   comments: many(comment),
+  discussion: many(discussion),
   // orderDetail: one(orderDetailSchema),
 
   orderProducts: one(orderProducts),

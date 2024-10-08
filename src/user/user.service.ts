@@ -10,6 +10,7 @@ import { phones } from "src/drizzle/schema/phones.schema";
 import { PhoneService } from "src/phone/phone.service";
 import { createId } from "@paralleldrive/cuid2";
 import { AddressService } from "src/address/address.service";
+import { comment } from "src/drizzle/schema/comment.schema";
 
 const saltOrRounds: number = 10;
 
@@ -94,6 +95,20 @@ export class UserService {
         address: true,
       },
     });
+  }
+
+  async findCommentByUserId(userId: number) {
+    return await this.db
+      .select({
+        id: comment.id,
+        content: comment.content,
+        rating: comment.rating,
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
+        // productId: comment.productId,
+      })
+      .from(comment)
+      .where(eq(comment.userId, userId));
   }
 
   async findUserDetail(userId: number) {

@@ -15,3 +15,4 @@ export * from "./feedback.schema";
 export * from "./ingredients.schema";
 export * from "./subscription.schema";
 export * from "./ingredients-in-products.schema";
+export * from "./discussion.schema";

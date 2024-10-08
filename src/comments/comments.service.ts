@@ -102,8 +102,23 @@ export class CommentsService {
 
   async findCommentByProductId(productId: number) {
     const comments = await this.db
-      .select()
+      .select({
+        id: comment.id,
+        content: comment.content,
+        rating: comment.rating,
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
+        user: {
+          userId: user.id,
+          username: user.name,
+          email: user.email,
+          avatar: user.avatar,
+          createdAt: user.createdAt,
+          // phoneAuth: user.phoneAuth,
+        },
+      })
       .from(comment)
+      .leftJoin(user, eq(user.id, comment.userId))
       .where(eq(comment.productId, productId));
 
     return comments;

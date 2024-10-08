@@ -2,8 +2,10 @@ import { Inject, Injectable, forwardRef } from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
 import { SQL, eq, inArray } from "drizzle-orm";
 import { CommentsService } from "src/comments/comments.service";
+import { DiscussionService } from "src/discussion/discussion.service";
 import { DRIZZLE } from "src/drizzle/drizzle.module";
 import { comment } from "src/drizzle/schema/comment.schema";
+import { discussion } from "src/drizzle/schema/discussion.schema";
 import { feedback } from "src/drizzle/schema/feedback.schema";
 import { ingredientsInProducts } from "src/drizzle/schema/ingredients-in-products.schema";
 import { ingredients } from "src/drizzle/schema/ingredients.schema";
@@ -18,6 +20,7 @@ import {
   product,
   UpdateProductProps,
 } from "src/drizzle/schema/product.schema";
+import { user } from "src/drizzle/schema/user.schema";
 import { StripeService } from "src/payments/stripe/stripe.service";
 import { ProductImagesService } from "src/product-images/product-images.service";
 import { DrizzleDbType } from "types/drizzle";
@@ -32,6 +35,7 @@ export class ProductsService {
     //* @Inject(REQUEST) ==> we should not use this way
     @Inject(forwardRef(() => CommentsService))
     private readonly commentService: CommentsService
+    // private readonly discussionService: DiscussionService
   ) {
     // console.log({ db });
   }
@@ -75,6 +79,8 @@ export class ProductsService {
         productId: product.id,
         productName: product.productName,
         productDescription: product.productDescription,
+        details: product.details,
+        usage: product.usage,
         price: product.price,
         discountPrice: product.discountPrice,
         discountPercentage: product.discountPercentage,
@@ -96,16 +102,57 @@ export class ProductsService {
 
     const productDetailData = productFilter[0];
 
+    //* images of product
     const productImages =
       await this.productImagesService.findImagesByProductId(productId);
 
+    //* comments of product
     const commentsProductDetail =
       await this.commentService.findCommentByProductId(productId);
+
+    //* discussion of product
+
+    const discussionProductDetail = await this.db
+      .select({
+        id: discussion.id,
+        discussionContent: discussion.content,
+        createdAt: discussion.createdAt,
+        updatedAt: discussion.updatedAt,
+        user: {
+          userId: user.id,
+          username: user.name,
+          email: user.email,
+          avatar: user.avatar,
+        },
+      })
+      .from(discussion)
+      .leftJoin(user, eq(user.id, discussion.userId))
+      .where(eq(discussion.productId, productId));
+
+    //* ingredients of product
+    const ingredientsProductDetail = await this.db
+      .select()
+      .from(ingredientsInProducts)
+      .where(eq(ingredientsInProducts.productId, productId));
+
+    const ingredientIds = ingredientsProductDetail.map((ingredient) => {
+      return ingredient.ingredientId;
+    });
+
+    const ingredientsDetail = await this.db
+      .select({
+        ingredientId: ingredients.id,
+        ingredientName: ingredients.ingredient,
+      })
+      .from(ingredients)
+      .where(inArray(ingredients.id, ingredientIds));
 
     const productDetail = {
       productId: productDetailData.productId,
       productName: productDetailData.productName,
       description: productDetailData.productDescription,
+      details: productDetailData.details,
+      usage: productDetailData.usage,
       price: productDetailData.price,
       discountPrice: productDetailData.discountPrice,
       discountPercentage: productDetailData.discountPercentage,
@@ -114,6 +161,8 @@ export class ProductsService {
       updatedAt: productDetailData.updatedAt,
       productImages,
       comments: commentsProductDetail,
+      discussion: discussionProductDetail,
+      ingredients: ingredientsDetail,
     };
 
     console.log(productDetail);
@@ -212,7 +261,7 @@ export class ProductsService {
   }
 
   async updateProduct(productId: number, updateProduct: UpdateProductProps) {
-    console.log({ updateProduct });
+    // console.log({ updateProduct });
 
     const {
       images,
@@ -236,7 +285,7 @@ export class ProductsService {
       insertValues.discountPrice = calculateDiscountPrice;
     }
 
-    console.log({ calculateDiscountPrice });
+    // console.log({ calculateDiscountPrice });
 
     const existingProductImages =
       await this.productImagesService.findImagesByProductId(productId);
@@ -288,6 +337,20 @@ export class ProductsService {
         .returning();
 
       console.log({ updateIngredientsInProducts });
+    }
+
+    // Remove old ingredients that are no longer in the update
+    const ingredientsToRemove = existingIngredientRelations.filter(
+      (existing) => !ingredientsIds.includes(existing.ingredientId)
+    );
+
+    if (ingredientsToRemove.length > 0) {
+      await this.db.delete(ingredientsInProducts).where(
+        inArray(
+          ingredientsInProducts.ingredientId,
+          ingredientsToRemove.map((ingredient) => ingredient.ingredientId)
+        )
+      );
     }
 
     const updateProductImages =

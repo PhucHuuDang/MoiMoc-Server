@@ -8,6 +8,7 @@ import { CommentsModule } from "src/comments/comments.module";
 import { CommentsService } from "src/comments/comments.service";
 import { StripeModule } from "src/payments/stripe/stripe.module";
 import { StripeService } from "src/payments/stripe/stripe.service";
+import { DiscussionModule } from "src/discussion/discussion.module";
 
 @Module({
   controllers: [ProductsController],

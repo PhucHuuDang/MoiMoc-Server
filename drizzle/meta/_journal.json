@@ -351,6 +351,20 @@
       "when": 1728116650491,
       "tag": "0049_perfect_sprite",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1728404051582,
+      "tag": "0050_keen_zarek",
+      "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1728404080621,
+      "tag": "0051_premium_hercules",
+      "breakpoints": true
     }
   ]
 }

@@ -14,6 +14,7 @@ import { IngredientsModule } from "./ingredients/ingredients.module";
 import { AuthModule } from "./auth/auth.module";
 import { StripeModule } from "./payments/stripe/stripe.module";
 import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
+import { DiscussionModule } from './discussion/discussion.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
     AuthModule,
     StripeModule,
     PaymentMethodsModule,
+    DiscussionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

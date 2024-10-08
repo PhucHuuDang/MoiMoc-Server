@@ -14,6 +14,7 @@ import { address } from "./address.schema";
 import { comment } from "./comment.schema";
 import { createInsertSchema } from "drizzle-zod";
 import { feedback } from "./feedback.schema";
+import { discussion } from "./discussion.schema";
 
 export const userRole = pgEnum("role", ["ADMIN", "STAFF", "MEMBER"]);
 
@@ -34,6 +35,7 @@ export const userRelations = relations(user, ({ one, many }) => ({
   phones: many(phones),
   address: many(address),
   comments: many(comment),
+  discussion: many(discussion),
   feedbacks: many(feedback),
 }));
 
