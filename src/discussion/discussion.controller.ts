@@ -1,15 +1,32 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { DiscussionService } from './discussion.service';
-import { CreateDiscussionDto } from './dto/create-discussion.dto';
-import { UpdateDiscussionDto } from './dto/update-discussion.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Put,
+  HttpException,
+} from "@nestjs/common";
+import { DiscussionService } from "./discussion.service";
+import { CreateDiscussionDto } from "./dto/create-discussion.dto";
+import { UpdateDiscussionDto } from "./dto/update-discussion.dto";
+import { InsertDiscussionTypes } from "src/drizzle/schema/discussion.schema";
 
-@Controller('discussion')
+@Controller("discussion")
 export class DiscussionController {
   constructor(private readonly discussionService: DiscussionService) {}
 
   @Post()
-  create(@Body() createDiscussionDto: CreateDiscussionDto) {
-    return this.discussionService.create(createDiscussionDto);
+  addDiscussion(@Body() discussionValues: InsertDiscussionTypes) {
+    const { content, userId, productId } = discussionValues;
+
+    if (!content || !userId || !productId) {
+      throw new HttpException("Lack some fields for discussion", 400);
+    }
+
+    return this.discussionService.addDiscussion(discussionValues);
   }
 
   @Get()
@@ -17,18 +34,25 @@ export class DiscussionController {
     return this.discussionService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.discussionService.findOne(+id);
+  @Get(":discussionId")
+  findOne(@Param("discussionId") discussionId: string) {
+    if (!discussionId) {
+      throw new HttpException("Invalid discussionId", 400);
+    }
+
+    return this.discussionService.findOneDiscussionById(+discussionId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDiscussionDto: UpdateDiscussionDto) {
-    return this.discussionService.update(+id, updateDiscussionDto);
+  @Put(":discussionId")
+  update(
+    @Param("discussionId") discussionId: string,
+    @Body() updateDiscussionDto: InsertDiscussionTypes
+  ) {
+    return this.discussionService.update(+discussionId, updateDiscussionDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.discussionService.remove(+id);
+  @Delete(":discussionId")
+  remove(@Param("discussionId") discussionId: string) {
+    return this.discussionService.remove(+discussionId);
   }
 }

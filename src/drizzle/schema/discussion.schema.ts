@@ -38,5 +38,5 @@ export const discussionRelations = relations(discussion, ({ one, many }) => ({
   }),
 }));
 
-export type InsertDiscussionProps = InferInsertModel<typeof discussion>;
+export type InsertDiscussionTypes = InferInsertModel<typeof discussion>;
 export type SelectDiscussionProps = InferInsertModel<typeof discussion>;
