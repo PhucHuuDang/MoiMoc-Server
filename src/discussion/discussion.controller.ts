@@ -8,19 +8,27 @@ import {
   Delete,
   Put,
   HttpException,
+  UseGuards,
+  Request,
 } from "@nestjs/common";
 import { DiscussionService } from "./discussion.service";
 import { CreateDiscussionDto } from "./dto/create-discussion.dto";
 import { UpdateDiscussionDto } from "./dto/update-discussion.dto";
 import { InsertDiscussionTypes } from "src/drizzle/schema/discussion.schema";
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth/jwt-auth.guard";
 
 @Controller("discussion")
 export class DiscussionController {
   constructor(private readonly discussionService: DiscussionService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  addDiscussion(@Body() discussionValues: InsertDiscussionTypes) {
-    const { content, userId, productId } = discussionValues;
+  addDiscussion(
+    @Request() req: any,
+    @Body() discussionValues: InsertDiscussionTypes
+  ) {
+    const userId = req.user.id;
+    const { content, productId } = discussionValues;
 
     if (!content || !userId || !productId) {
       throw new HttpException("Lack some fields for discussion", 400);
