@@ -28,13 +28,18 @@ export class DiscussionController {
     @Body() discussionValues: InsertDiscussionTypes
   ) {
     const userId = req.user.id;
+
+    console.log({ userId });
     const { content, productId } = discussionValues;
 
     if (!content || !userId || !productId) {
       throw new HttpException("Lack some fields for discussion", 400);
     }
 
-    return this.discussionService.addDiscussion(discussionValues);
+    return this.discussionService.addDiscussion({
+      ...discussionValues,
+      userId,
+    });
   }
 
   @Get()
