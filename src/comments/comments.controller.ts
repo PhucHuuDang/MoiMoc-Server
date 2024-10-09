@@ -39,7 +39,7 @@ export class CommentsController {
       );
     }
 
-    return this.commentsService.addComment(addCommentValues);
+    return this.commentsService.addComment({ ...addCommentValues, userId });
   }
 
   @Get()
