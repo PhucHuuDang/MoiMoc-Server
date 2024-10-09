@@ -9,21 +9,28 @@ import {
   HttpException,
   HttpStatus,
   Put,
+  UseGuards,
+  Request,
 } from "@nestjs/common";
 import { CommentsService } from "./comments.service";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { UpdateCommentDto } from "./dto/update-comment.dto";
 import { InsertCommentProps } from "src/drizzle/schema/comment.schema";
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth/jwt-auth.guard";
 
 @Controller("comments")
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   addComment(
+    @Request() req: any,
     @Body() addCommentValues: InsertCommentProps & { rating?: number }
   ) {
-    const { content, productId, userId } = addCommentValues;
+    const userId = req.user.id;
+
+    const { content, productId } = addCommentValues;
 
     if (!content || !userId || !productId) {
       throw new HttpException(
