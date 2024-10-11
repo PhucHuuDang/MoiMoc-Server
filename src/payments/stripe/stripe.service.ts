@@ -93,15 +93,18 @@ export class StripeService {
       price: number;
       name: string;
       description: string;
+      imageUrl: string;
+      phoneAuth: string;
     },
     userId: string
   ) {
     let url = "";
 
-    const { email, price, name, description } = checkoutValues;
+    const { email, price, name, description, imageUrl, phoneAuth } =
+      checkoutValues;
 
-    const successUrl = absoluteUrl("/success");
-    const cancelUrl = absoluteUrl("/cancel");
+    const successUrl = absoluteUrl("/success?session_id={CHECKOUT_SESSION_ID}");
+    const cancelUrl = absoluteUrl("/cancel?session_id={CHECKOUT_SESSION_ID}");
 
     try {
       const userSubscription = await this.db
@@ -111,19 +114,24 @@ export class StripeService {
 
       if (userSubscription[0] && userSubscription[0].stripeCustomerId) {
         const stripeSession = await this.stripe.billingPortal.sessions.create({
-          customer: "",
-          return_url: "https://example.com/account",
+          customer: "test",
+          return_url: "https://example.com/harrydangaccount",
         });
 
         url = stripeSession.url;
       } else {
         const stripSession = await this.stripe.checkout.sessions.create({
-          success_url: successUrl,
-          cancel_url: cancelUrl,
           payment_method_types: ["card"],
           mode: "payment",
           billing_address_collection: "auto",
           customer_email: email || null,
+          metadata: {
+            phone: "0814593739", // Store the phone number in metadata
+            userId: 54,
+          },
+          // shipping_address_collection: {
+          //   allowed_countries: ["US", "VN"],
+          // },
           line_items: [
             {
               price_data: {
@@ -131,24 +139,61 @@ export class StripeService {
                 product_data: {
                   name,
                   description,
+                  images: [imageUrl, imageUrl],
                 },
                 unit_amount: price,
                 // recurring: { interval: "" },
               },
               quantity: 1,
             },
+            // {
+            //   price_data: {
+            //     currency: "VND",
+            //     product_data: {
+            //       name,
+            //       description,
+            //       images: [imageUrl],
+            //     },
+
+            //     unit_amount: price,
+            //     // recurring: { interval: "" },
+            //   },
+            //   quantity: 2,
+            // },
+            // {
+            //   price_data: {
+            //     currency: "VND",
+            //     product_data: {
+            //       name,
+            //       description,
+            //       images: [imageUrl],
+            //     },
+            //     unit_amount: price,
+            //     // recurring: { interval: "" },
+            //   },
+            //   quantity: 1,
+            // },
           ],
+
+          success_url: successUrl,
+          cancel_url: cancelUrl,
         });
 
         url = stripSession.url || "";
       }
 
       return {
-        data: url,
+        paymentUrl: url,
       };
     } catch (error) {
       console.log({ error });
     }
+  }
+
+  async retrieveBalance() {
+    const balance = await this.stripe.balance.retrieve();
+
+    return balance;
   }
 
   async getBillings() {
