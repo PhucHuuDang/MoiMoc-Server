@@ -1,5 +1,5 @@
 import { product } from "./../../drizzle/schema/product.schema";
-import { Inject, Injectable } from "@nestjs/common";
+import { HttpException, Inject, Injectable } from "@nestjs/common";
 import Stripe from "stripe";
 import { OrderValuesType, ProductValuesType } from "./types/stripe-types";
 import { absoluteUrl } from "../lib/absolute-url";
@@ -132,11 +132,11 @@ export class StripeService {
               images: [product.imageUrl],
             },
             unit_amount: product.discountPrice
-              ? Number(product.discountPrice)
-              : Number(product.price),
+              ? Number(product.discountPrice) * 100
+              : Number(product.price) * 100,
             // recurring: { interval: "" },
           },
-          quantity: product.quantityOrder,
+          quantity: Number(product.quantityOrder),
         };
       });
 
@@ -162,34 +162,6 @@ export class StripeService {
           // },
           line_items: line_items,
 
-          // {
-          //   price_data: {
-          //     currency: "VND",
-          //     product_data: {
-          //       name,
-          //       description,
-          //       images: [imageUrl],
-          //     },
-
-          //     unit_amount: price,
-          //     // recurring: { interval: "" },
-          //   },
-          //   quantity: 2,
-          // },
-          // {
-          //   price_data: {
-          //     currency: "VND",
-          //     product_data: {
-          //       name,
-          //       description,
-          //       images: [imageUrl],
-          //     },
-          //     unit_amount: price,
-          //     // recurring: { interval: "" },
-          //   },
-          //   quantity: 1,
-          // },
-
           success_url: successUrl,
           cancel_url: cancelUrl,
         });
@@ -201,7 +173,8 @@ export class StripeService {
         paymentUrl: url,
       };
     } catch (error) {
-      console.log({ error });
+      console.error(error);
+      throw new HttpException("Failed to create payment session", 500);
     }
   }
 

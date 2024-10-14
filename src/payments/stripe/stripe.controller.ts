@@ -66,14 +66,15 @@ export class StripeController {
       throw new HttpException("Product values are required", 400);
     }
 
-    const result = await this.stripeService.createCheckoutSession(
-      checkoutValues,
-      userId
-    );
-
-    console.log({ result });
-
-    return result;
+    try {
+      const result = await this.stripeService.createCheckoutSession(
+        checkoutValues,
+        userId
+      );
+      return result;
+    } catch (error) {
+      throw new HttpException("Failed to create payment session", 500);
+    }
   }
 
   @Post("/webhook")
