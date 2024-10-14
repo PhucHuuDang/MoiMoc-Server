@@ -39,4 +39,5 @@ export type OrderValuesType = {
     imageUrl: string;
     quantityOrder: number;
   }[];
+  discountCode?: string | undefined;
 };
