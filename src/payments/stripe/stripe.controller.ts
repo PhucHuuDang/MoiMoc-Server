@@ -73,7 +73,8 @@ export class StripeController {
       );
       return result;
     } catch (error) {
-      throw new HttpException("Failed to create payment session", 500);
+      console.log({ error });
+      throw new HttpException(`Failed to create payment session ${error}`, 500);
     }
   }
 
@@ -97,7 +98,7 @@ export class StripeController {
     try {
       // const rawBody = JSON.stringify(req.body);
       event = this.stripe.webhooks.constructEvent(
-        req,
+        req.rawBody,
         signature,
         process.env.WEBHOOK_SECRET_KEY
       );
