@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -6,12 +7,17 @@ import {
   HttpException,
   Param,
   Post,
-  Request,
+  RawBody,
+  RawBodyRequest,
+  Req,
   Response,
+  UseGuards,
 } from "@nestjs/common";
 import { StripeService } from "./stripe.service";
-import { ProductValuesType } from "./types/stripe-types";
+import { OrderValuesType, ProductValuesType } from "./types/stripe-types";
 import Stripe from "stripe";
+import { Request } from "express";
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth/jwt-auth.guard";
 
 @Controller("stripe")
 export class StripeController {
@@ -36,23 +42,27 @@ export class StripeController {
     return result;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post("/payment")
   async createCheckoutSession(
-    @Request() req: any,
+    @Req() req: any,
     @Body()
-    checkoutValues: {
-      email: string;
-      price: number;
-      name: string;
-      description: string;
-      imageUrl: string;
-      phoneAuth: string;
-    }
+    checkoutValues: OrderValuesType
   ) {
-    const userId = "58";
-    const { name, description, price, email } = checkoutValues;
+    const userId = req.user.id;
+    console.log(req.user);
+    const { user, address, phone, method, paymentMethod, products } =
+      checkoutValues;
 
-    if (!name || !description || !price || !userId) {
+    if (
+      !user ||
+      !address ||
+      !phone ||
+      !method ||
+      !paymentMethod ||
+      !products ||
+      !userId
+    ) {
       throw new HttpException("Product values are required", 400);
     }
 
@@ -69,25 +79,30 @@ export class StripeController {
   @Post("/webhook")
   async handleWebhook(
     @Headers("stripe-signature") signature: string,
-    @Request() req: any,
+    @Req() req: any,
     @Response() res: any
   ) {
     let event: Stripe.Event;
 
-    console.log({ signature, req, res });
+    console.log({ req });
+    console.log(req.body);
+    console.log(req.rawBody);
 
-    console.log(process.env.WEBHOOK_SECRET_KEY);
+    console.log(process.env.WEBHOOK_SECRET_KEY, { signature });
+
+    console.log(req.body.toString("utf8"));
+    const raw = req.body.toString("utf8");
 
     try {
-      const rawBody = req.rawBody.toString();
-      console.log({ rawBody });
+      // const rawBody = JSON.stringify(req.body);
       event = this.stripe.webhooks.constructEvent(
-        rawBody,
+        raw,
         signature,
         process.env.WEBHOOK_SECRET_KEY
       );
     } catch (error) {
-      console.error("Webhook signature verification failed.");
+      console.log("webhook error: ", error);
+      // console.error("Webhook signature verification failed.");
       throw new HttpException("Webhook signature verification failed.", 400);
     }
 

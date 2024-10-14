@@ -1,7 +1,7 @@
 import { product } from "./../../drizzle/schema/product.schema";
 import { Inject, Injectable } from "@nestjs/common";
 import Stripe from "stripe";
-import { ProductValuesType } from "./types/stripe-types";
+import { OrderValuesType, ProductValuesType } from "./types/stripe-types";
 import { absoluteUrl } from "../lib/absolute-url";
 import { DRIZZLE } from "src/drizzle/drizzle.module";
 import { DrizzleDbType } from "types/drizzle";
@@ -87,24 +87,34 @@ export class StripeService {
     return productsWithPrices;
   }
 
-  async createCheckoutSession(
-    checkoutValues: {
-      email: string;
-      price: number;
-      name: string;
-      description: string;
-      imageUrl: string;
-      phoneAuth: string;
-    },
-    userId: string
-  ) {
+  async createCheckoutSession(checkoutValues: OrderValuesType, userId: string) {
     let url = "";
 
-    const { email, price, name, description, imageUrl, phoneAuth } =
+    const { user, address, phone, method, paymentMethod, products } =
       checkoutValues;
 
-    const successUrl = absoluteUrl("/success?session_id={CHECKOUT_SESSION_ID}");
-    const cancelUrl = absoluteUrl("/cancel?session_id={CHECKOUT_SESSION_ID}");
+    const { avatar, ...info } = user;
+
+    // const successUrl = absoluteUrl("/success?session_id={CHECKOUT_SESSION_ID}");
+    const successUrl = absoluteUrl("/");
+    // const cancelUrl = absoluteUrl("/cancel?session_id={CHECKOUT_SESSION_ID}");
+    const cancelUrl = absoluteUrl("/");
+
+    const metadata = {
+      user: JSON.stringify(info),
+      products: JSON.stringify(
+        products.map((product) => {
+          return {
+            productId: product.productId,
+            quantity: product.quantityOrder,
+          };
+        })
+      ),
+      address,
+      phone,
+      method,
+      paymentMethod,
+    };
 
     try {
       const userSubscription = await this.db
@@ -112,10 +122,28 @@ export class StripeService {
         .from(subscription)
         .where(eq(subscription.stripeCustomerId, userId));
 
+      const line_items = products.map((product) => {
+        return {
+          price_data: {
+            currency: "VND",
+            product_data: {
+              name: product.productName,
+              description: product.productDescription,
+              images: [product.imageUrl],
+            },
+            unit_amount: product.discountPrice
+              ? Number(product.discountPrice)
+              : Number(product.price),
+            // recurring: { interval: "" },
+          },
+          quantity: product.quantityOrder,
+        };
+      });
+
       if (userSubscription[0] && userSubscription[0].stripeCustomerId) {
         const stripeSession = await this.stripe.billingPortal.sessions.create({
           customer: "test",
-          return_url: "https://example.com/harrydangaccount",
+          return_url: `${process.env.DOMAIN}`,
         });
 
         url = stripeSession.url;
@@ -124,56 +152,43 @@ export class StripeService {
           payment_method_types: ["card"],
           mode: "payment",
           billing_address_collection: "auto",
-          customer_email: email || null,
-          metadata: {
-            phone: "0814593739", // Store the phone number in metadata
-            userId: 54,
+          customer_email: user.email || null,
+          invoice_creation: {
+            enabled: true,
           },
+          metadata,
           // shipping_address_collection: {
           //   allowed_countries: ["US", "VN"],
           // },
-          line_items: [
-            {
-              price_data: {
-                currency: "VND",
-                product_data: {
-                  name,
-                  description,
-                  images: [imageUrl, imageUrl],
-                },
-                unit_amount: price,
-                // recurring: { interval: "" },
-              },
-              quantity: 1,
-            },
-            // {
-            //   price_data: {
-            //     currency: "VND",
-            //     product_data: {
-            //       name,
-            //       description,
-            //       images: [imageUrl],
-            //     },
+          line_items: line_items,
 
-            //     unit_amount: price,
-            //     // recurring: { interval: "" },
-            //   },
-            //   quantity: 2,
-            // },
-            // {
-            //   price_data: {
-            //     currency: "VND",
-            //     product_data: {
-            //       name,
-            //       description,
-            //       images: [imageUrl],
-            //     },
-            //     unit_amount: price,
-            //     // recurring: { interval: "" },
-            //   },
-            //   quantity: 1,
-            // },
-          ],
+          // {
+          //   price_data: {
+          //     currency: "VND",
+          //     product_data: {
+          //       name,
+          //       description,
+          //       images: [imageUrl],
+          //     },
+
+          //     unit_amount: price,
+          //     // recurring: { interval: "" },
+          //   },
+          //   quantity: 2,
+          // },
+          // {
+          //   price_data: {
+          //     currency: "VND",
+          //     product_data: {
+          //       name,
+          //       description,
+          //       images: [imageUrl],
+          //     },
+          //     unit_amount: price,
+          //     // recurring: { interval: "" },
+          //   },
+          //   quantity: 1,
+          // },
 
           success_url: successUrl,
           cancel_url: cancelUrl,

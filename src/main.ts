@@ -21,7 +21,20 @@ async function bootstrap() {
   //     req.rawBody = req.body;
   //     next();
   //   }
-  // );
+  // )
+
+  // const rawBodyBuffer = (req, res, buffer, encoding) => {
+  //   if (!req.headers["stripe-signature"]) {
+  //     return;
+  //   }
+
+  //   if (buffer && buffer.length) {
+  //     req.rawBody = buffer.toString(encoding || "utf8");
+  //   }
+  // };
+
+  // app.use(bodyParser.urlencoded({ verify: rawBodyBuffer, extended: true }));
+  // app.use(bodyParser.json({ verify: rawBodyBuffer }));
 
   await app.listen(3002);
 }

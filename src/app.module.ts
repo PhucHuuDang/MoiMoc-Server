@@ -41,18 +41,18 @@ import { JsonBodyMiddleware } from "./json-body.middleware";
     DiscussionModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, RawBodyMiddleware, JsonBodyMiddleware],
 })
-// export class AppModule {}
-export class AppModule implements NestModule {
-  public configure(consumer: MiddlewareConsumer): void {
-    consumer
-      .apply(RawBodyMiddleware)
-      .forRoutes({
-        path: "/stripe/webhook",
-        method: RequestMethod.POST,
-      })
-      .apply(JsonBodyMiddleware)
-      .forRoutes("*");
-  }
-}
+export class AppModule {}
+// export class AppModule implements NestModule {
+//   public configure(consumer: MiddlewareConsumer): void {
+//     consumer
+//       .apply(RawBodyMiddleware)
+//       .forRoutes({
+//         path: "/stripe/webhook",
+//         method: RequestMethod.POST,
+//       })
+//       .apply(JsonBodyMiddleware)
+//       .forRoutes("*");
+//   }
+// }
