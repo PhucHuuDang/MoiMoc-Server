@@ -97,7 +97,7 @@ export class StripeController {
     try {
       // const rawBody = JSON.stringify(req.body);
       event = this.stripe.webhooks.constructEvent(
-        raw,
+        req,
         signature,
         process.env.WEBHOOK_SECRET_KEY
       );
