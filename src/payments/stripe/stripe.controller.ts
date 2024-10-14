@@ -17,7 +17,7 @@ import { OrderValuesType, ProductValuesType } from "./types/stripe-types";
 import Stripe from "stripe";
 import { Request } from "express";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth/jwt-auth.guard";
-import { RawBody } from "src/custom-decorators/raw-body.decorator";
+import { RawBody } from "../../custom-decorators/raw-body.decorator";
 
 @Controller("stripe")
 export class StripeController {
