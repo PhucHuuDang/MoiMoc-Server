@@ -24,7 +24,7 @@ export type OrderValuesType = {
     email: string | null;
     phoneAuth: string;
     avatar: string;
-    role: "ADMIN" | "USER" | "GUEST"; // Enum for possible roles
+    role: string; // Enum for possible roles
   };
   address: string;
   phone: string;

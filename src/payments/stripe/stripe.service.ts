@@ -132,8 +132,8 @@ export class StripeService {
               images: [product.imageUrl],
             },
             unit_amount: product.discountPrice
-              ? Number(product.discountPrice) * 100
-              : Number(product.price) * 100,
+              ? Number(product.discountPrice)
+              : Number(product.price),
             // recurring: { interval: "" },
           },
           quantity: Number(product.quantityOrder),
@@ -174,7 +174,7 @@ export class StripeService {
       };
     } catch (error) {
       console.error(error);
-      throw new HttpException("Failed to create payment session", 500);
+      throw new HttpException("Thanh toán thất bại", 500);
     }
   }
 

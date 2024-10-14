@@ -18,16 +18,16 @@ import { JsonBodyMiddleware } from "src/json-body.middleware";
   controllers: [StripeController],
   imports: [DrizzleModule],
 })
-// export class StripeModule {}
-export class StripeModule implements NestModule {
-  public configure(consumer: MiddlewareConsumer): void {
-    consumer
-      .apply(RawBodyMiddleware)
-      .forRoutes({
-        path: "/stripe/webhook",
-        method: RequestMethod.POST,
-      })
-      .apply(JsonBodyMiddleware)
-      .forRoutes("*");
-  }
-}
+export class StripeModule {}
+// export class StripeModule implements NestModule {
+//   public configure(consumer: MiddlewareConsumer): void {
+//     consumer
+//       .apply(RawBodyMiddleware)
+//       .forRoutes({
+//         path: "/stripe/webhook",
+//         method: RequestMethod.POST,
+//       })
+//       .apply(JsonBodyMiddleware)
+//       .forRoutes("*");
+//   }
+// }

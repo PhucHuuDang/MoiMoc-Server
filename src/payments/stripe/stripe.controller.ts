@@ -7,7 +7,6 @@ import {
   HttpException,
   Param,
   Post,
-  RawBody,
   RawBodyRequest,
   Req,
   Response,
@@ -18,6 +17,7 @@ import { OrderValuesType, ProductValuesType } from "./types/stripe-types";
 import Stripe from "stripe";
 import { Request } from "express";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth/jwt-auth.guard";
+import { RawBody } from "src/custom-decorators/raw-body.decorator";
 
 @Controller("stripe")
 export class StripeController {
@@ -80,7 +80,7 @@ export class StripeController {
   @Post("/webhook")
   async handleWebhook(
     @Headers("stripe-signature") signature: string,
-    @Req() req: any,
+    @RawBody() req: any,
     @Response() res: any
   ) {
     let event: Stripe.Event;
