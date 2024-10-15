@@ -96,9 +96,9 @@ export class StripeService {
     const { avatar, ...info } = user;
 
     // const successUrl = absoluteUrl("/success?session_id={CHECKOUT_SESSION_ID}");
-    const successUrl = "https://moi-moc-client.vercel.app/success";
+    const successUrl = "https://moi-moc-client.vercel.app/";
     // const cancelUrl = absoluteUrl("/cancel?session_id={CHECKOUT_SESSION_ID}");
-    const cancelUrl = "https://moi-moc-client.vercel.app/cancel";
+    const cancelUrl = "https://moi-moc-client.vercel.app/";
 
     const metadata = {
       user: JSON.stringify(info),

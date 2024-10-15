@@ -97,6 +97,8 @@ export class StripeController {
     console.log(req.body.toString("utf8"));
     const raw = req.body.toString("utf8");
 
+    console.log({ raw });
+
     try {
       // const rawBody = JSON.stringify(req.body);
       event = this.stripe.webhooks.constructEvent(
