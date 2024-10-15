@@ -4,7 +4,10 @@ import { ExpressAdapter } from "@nestjs/platform-express";
 import * as bodyParser from "body-parser";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bodyParser: false });
+  const app = await NestFactory.create(AppModule, {
+    bodyParser: false,
+    logger: ["log", "error", "warn"],
+  });
 
   app.enableCors({
     origin: [process.env.LOCAL_DOMAIN, process.env.PRODUCTION_DOMAIN],

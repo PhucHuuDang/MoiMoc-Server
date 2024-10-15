@@ -66,6 +66,8 @@ export class StripeController {
       throw new HttpException("Product values are required", 400);
     }
 
+    console.log({ checkoutValues });
+
     try {
       const result = await this.stripeService.createCheckoutSession(
         checkoutValues,
@@ -81,7 +83,7 @@ export class StripeController {
   @Post("/webhook")
   async handleWebhook(
     @Headers("stripe-signature") signature: string,
-    @RawBody() req: any,
+    @Req() req: any,
     @Response() res: any
   ) {
     let event: Stripe.Event;

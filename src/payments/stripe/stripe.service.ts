@@ -96,9 +96,9 @@ export class StripeService {
     const { avatar, ...info } = user;
 
     // const successUrl = absoluteUrl("/success?session_id={CHECKOUT_SESSION_ID}");
-    const successUrl = absoluteUrl("/");
+    const successUrl = "https://moi-moc-client.vercel.app/success";
     // const cancelUrl = absoluteUrl("/cancel?session_id={CHECKOUT_SESSION_ID}");
-    const cancelUrl = absoluteUrl("/");
+    const cancelUrl = "https://moi-moc-client.vercel.app/cancel";
 
     const metadata = {
       user: JSON.stringify(info),
@@ -153,9 +153,9 @@ export class StripeService {
           mode: "payment",
           billing_address_collection: "auto",
           customer_email: user.email || null,
-          invoice_creation: {
-            enabled: true,
-          },
+          // invoice_creation: {
+          //   enabled: true,
+          // },
           metadata,
           // shipping_address_collection: {
           //   allowed_countries: ["US", "VN"],
