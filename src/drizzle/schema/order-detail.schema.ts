@@ -7,13 +7,14 @@ import { paymentMethod } from "./payment-method.schema";
 import { orderProducts } from "./order-products";
 import { delivery } from "./delivery-method.schema";
 import { subscription } from "./subscription.schema";
+import { usersOrders } from "./users-orders.schema";
 
 export const orderDetailSchema = pgTable("orderDetail", {
   id: serial("id").primaryKey(),
 
-  userId: integer("userId")
-    .notNull()
-    .references(() => user.id),
+  // userId: integer("userId")
+  //   .notNull()
+  //   .references(() => user.id),
 
   paymentMethodId: integer("paymentMethodId")
     .references(() => paymentMethod.id)
@@ -22,6 +23,8 @@ export const orderDetailSchema = pgTable("orderDetail", {
   deliveryMethodId: integer("deliveryMethodId")
     .references(() => delivery.id)
     .notNull(),
+
+  totalAmount: integer("totalAmount").notNull(),
 
   discountCode: text("discountCode"),
 
@@ -32,10 +35,12 @@ export const orderDetailSchema = pgTable("orderDetail", {
 export const orderDetailRelations = relations(
   orderDetailSchema,
   ({ one, many }) => ({
-    user: one(user, {
-      fields: [orderDetailSchema.userId],
-      references: [user.id],
-    }),
+    // user: one(user, {
+    //   fields: [orderDetailSchema.userId],
+    //   references: [user.id],
+    // }),
+
+    usersOrders: many(usersOrders),
 
     orderProducts: many(orderProducts),
 
@@ -49,7 +54,7 @@ export const orderDetailRelations = relations(
       references: [paymentMethod.id],
     }),
 
-    subscription: one(subscription),
+    // subscription: one(subscription),
   })
 );
 

@@ -16,3 +16,4 @@ export * from "./ingredients.schema";
 export * from "./subscription.schema";
 export * from "./ingredients-in-products.schema";
 export * from "./discussion.schema";
+export * from "./users-orders.schema";

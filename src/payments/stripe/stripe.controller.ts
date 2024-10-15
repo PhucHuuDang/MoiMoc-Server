@@ -9,13 +9,13 @@ import {
   Post,
   RawBodyRequest,
   Req,
-  Response,
+  Res,
   UseGuards,
 } from "@nestjs/common";
 import { StripeService } from "./stripe.service";
 import { OrderValuesType, ProductValuesType } from "./types/stripe-types";
 import Stripe from "stripe";
-import { Request } from "express";
+import { Request, Response } from "express";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth/jwt-auth.guard";
 import { RawBody } from "../../custom-decorators/raw-body.decorator";
 
@@ -84,7 +84,8 @@ export class StripeController {
   async handleWebhook(
     @Headers("stripe-signature") signature: string,
     @Req() req: any,
-    @Response() res: any
+    @Res() res: Response,
+    @RawBody() rawBody: Buffer
   ) {
     let event: Stripe.Event;
 
@@ -92,19 +93,27 @@ export class StripeController {
     console.log(req.body);
     console.log(req.rawBody);
 
+    console.log({ rawBody });
+
+    const signInSecretLocal =
+      "whsec_7c5951bf1e6c8fac053e102d1970b46cbd13ee010bf28a865cd2275de4c86375";
+
     console.log(process.env.WEBHOOK_SECRET_KEY, { signature });
 
     console.log(req.body.toString("utf8"));
     const raw = req.body.toString("utf8");
+    const rawTest = req.body.toString();
 
     console.log({ raw });
+
+    console.log({ rawTest });
 
     try {
       // const rawBody = JSON.stringify(req.body);
       event = this.stripe.webhooks.constructEvent(
-        req.rawBody,
+        raw,
         signature,
-        process.env.WEBHOOK_SECRET_KEY
+        signInSecretLocal
       );
     } catch (error) {
       console.log("webhook error: ", error);
@@ -117,8 +126,20 @@ export class StripeController {
     console.log({ session });
 
     //* the account of the user
-    if (!session.metadata.phoneAuth) {
-      throw new HttpException("User not authenticated", 400);
+    // if (!session.metadata.phoneAuth) {
+    //   throw new HttpException("User not authenticated", 400);
+    // }
+
+    if (event.type === "payment_intent.succeeded") {
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+
+      try {
+        const paymentData = await this.stripe.paymentIntents.retrieve(
+          paymentIntent.id as string
+        );
+
+        console.log(paymentData.metadata);
+      } catch (error) {}
     }
 
     switch (event.type) {
@@ -131,20 +152,6 @@ export class StripeController {
         );
 
         break;
-
-      case "payment_intent.succeeded": {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
-
-        console.log({ paymentIntent });
-
-        // Log the success of the payment
-        console.log(`Payment for ${paymentIntent.amount} was successful!`);
-
-        // Handle storing or updating payment status in the database
-        // await this.savePaymentDetails(paymentIntent);
-
-        break;
-      }
 
       case "payment_method.attached":
         const paymentMethod = event.data.object;

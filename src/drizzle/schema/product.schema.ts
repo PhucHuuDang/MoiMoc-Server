@@ -62,7 +62,7 @@ export const productRelations = relations(product, ({ one, many }) => ({
   discussion: many(discussion),
   // orderDetail: one(orderDetailSchema),
 
-  orderProducts: one(orderProducts),
+  orderProducts: many(orderProducts),
 
   custom: many(custom),
 
