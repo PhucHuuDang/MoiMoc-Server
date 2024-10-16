@@ -57,7 +57,7 @@ export class DeliveryMethodsService {
     try {
       const updatedDeliveryMethod = await this.db
         .update(delivery)
-        .set({ isActive } as Partial<DeliveryInsertTypes>) // Active is recognized as boolean here
+        .set({ active: isActive } as Partial<DeliveryInsertTypes>) // Active is recognized as boolean here
         .where(eq(delivery.id, deliveryId))
         .returning();
 
