@@ -50,11 +50,12 @@ export class DeliveryMethodsController {
   @Put("/active/:deliveryId")
   updateStatus(
     @Param("deliveryId") deliveryId: string,
-    @Body() isActive: boolean
+    @Body("active") active: boolean
   ) {
+    console.log({ active, deliveryId });
     return this.deliveryMethodsService.updateStatusDeliveryMethod(
       +deliveryId,
-      isActive
+      active
     );
   }
 

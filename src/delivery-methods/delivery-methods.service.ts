@@ -25,6 +25,7 @@ export class DeliveryMethodsService {
       };
     } catch (error) {
       console.log({ error });
+      throw new HttpException("Error creating delivery", 400);
     }
   }
 
@@ -35,6 +36,7 @@ export class DeliveryMethodsService {
       return deliveryMethods;
     } catch (error) {
       console.log({ error });
+      throw new HttpException("Error finding all delivery methods", 400);
     }
   }
 
@@ -42,7 +44,7 @@ export class DeliveryMethodsService {
     return `This action returns a #${deliveryId} deliveryMethod`;
   }
 
-  async updateStatusDeliveryMethod(deliveryId: number, isActive: boolean) {
+  async updateStatusDeliveryMethod(deliveryId: number, active: boolean) {
     const isExistDelivery = await this.db
       .select()
       .from(delivery)
@@ -53,19 +55,23 @@ export class DeliveryMethodsService {
         message: "Delivery method not found",
       };
     }
+    console.log(active, deliveryId);
 
     try {
       const updatedDeliveryMethod = await this.db
         .update(delivery)
-        .set({ active: isActive } as Partial<DeliveryInsertTypes>) // Active is recognized as boolean here
+        .set({ active } as Partial<DeliveryInsertTypes>) // Active is recognized as boolean here
         .where(eq(delivery.id, deliveryId))
         .returning();
+
+      console.log({ updatedDeliveryMethod });
 
       return {
         message: `Updated status ${updatedDeliveryMethod[0].method} successfully`,
       };
     } catch (error) {
       console.log({ error });
+      throw new HttpException("Error updating delivery status", 400);
     }
   }
 
@@ -109,6 +115,7 @@ export class DeliveryMethodsService {
       };
     } catch (error) {
       console.log({ error });
+      throw new HttpException("Error updating delivery info", 400);
     }
   }
 
@@ -135,6 +142,7 @@ export class DeliveryMethodsService {
       };
     } catch (error) {
       console.log({ error });
+      throw new HttpException("Error deleting delivery", 400);
     }
   }
 }
