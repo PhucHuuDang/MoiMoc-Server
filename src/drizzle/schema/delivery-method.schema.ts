@@ -1,5 +1,6 @@
 import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
 import {
+  boolean,
   decimal,
   integer,
   numeric,
@@ -14,6 +15,10 @@ export const delivery = pgTable("deliveryMethod", {
   method: text("method").notNull(),
   // price: numeric('price').notNull(),
   price: numeric("price", { precision: 15, scale: 0 }).notNull(),
+  active: boolean("active").notNull().default(true),
+  estimatedDays: text("estimatedDays").notNull(),
+  ordersLastMonth: numeric("ordersLastMonth"),
+  revenue: numeric("revenue"),
 });
 
 export const deliveryRelations = relations(delivery, ({ one }) => ({

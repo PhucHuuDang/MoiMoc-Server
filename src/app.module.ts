@@ -22,6 +22,7 @@ import { PaymentMethodsModule } from "./payment-methods/payment-methods.module";
 import { DiscussionModule } from "./discussion/discussion.module";
 import { RawBodyMiddleware } from "./raw-body.middleware";
 import { JsonBodyMiddleware } from "./json-body.middleware";
+import { DeliveryMethodsModule } from './delivery-methods/delivery-methods.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { JsonBodyMiddleware } from "./json-body.middleware";
     StripeModule,
     PaymentMethodsModule,
     DiscussionModule,
+    DeliveryMethodsModule,
   ],
   controllers: [AppController],
   providers: [AppService, RawBodyMiddleware, JsonBodyMiddleware],
