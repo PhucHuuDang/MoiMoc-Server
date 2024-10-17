@@ -20,7 +20,7 @@ export class PaymentMethodsController {
 
   @Post()
   createPaymentMethod(@Body() values: PaymentMethodProps) {
-    const { method, price } = values;
+    const { method } = values;
 
     if (!method) {
       throw new HttpException("Method is required", 400);
@@ -44,7 +44,7 @@ export class PaymentMethodsController {
   }
 
   @Put(":methodId")
-  updateMethod(
+  updateInfoMethod(
     @Param("methodId") methodId: string,
     @Body() values: PaymentMethodProps
   ) {
@@ -53,6 +53,23 @@ export class PaymentMethodsController {
     }
 
     return this.paymentMethodsService.updateMethod(+methodId, values);
+  }
+
+  @Put("/status/:methodId")
+  async updateStatusMethod(
+    @Body("status") status: boolean,
+    @Param("methodId") methodId: string
+  ) {
+    if (!methodId) {
+      throw new HttpException("Method ID is required", 400);
+    }
+
+    const response = await this.paymentMethodsService.updateStatusMethod(
+      +methodId,
+      status
+    );
+
+    return response;
   }
 
   @Delete(":methodId")
