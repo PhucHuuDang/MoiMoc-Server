@@ -5,6 +5,7 @@ import { DRIZZLE } from "src/drizzle/drizzle.module";
 import { DrizzleDbType } from "types/drizzle";
 import {
   PaymentMethodProps,
+  PaymentSelectValues,
   paymentMethod,
 } from "src/drizzle/schema/payment-method.schema";
 import { eq } from "drizzle-orm";
@@ -28,14 +29,14 @@ export class PaymentMethodsService {
   }
 
   async getAllPaymentMethods() {
-    const methods = await this.db.query.paymentMethod.findMany();
+    try {
+      const methods = await this.db.query.paymentMethod.findMany();
 
-    if (!methods.length) {
-      return {
-        message: "No payment methods found",
-      };
+      return methods;
+    } catch (error) {
+      console.log({ error });
+      throw new HttpException("Error finding all payment methods", 400);
     }
-    return methods;
   }
 
   async findOneMethod(methodId: number) {

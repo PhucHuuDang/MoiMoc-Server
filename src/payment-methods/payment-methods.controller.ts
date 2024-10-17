@@ -30,8 +30,10 @@ export class PaymentMethodsController {
   }
 
   @Get()
-  getAllPaymentMethods() {
-    return this.paymentMethodsService.getAllPaymentMethods();
+  async getAllPaymentMethods() {
+    const paymentMethods = this.paymentMethodsService.getAllPaymentMethods();
+
+    return paymentMethods;
   }
 
   @Get(":methodId")

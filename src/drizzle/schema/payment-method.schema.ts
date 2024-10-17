@@ -8,13 +8,13 @@ import {
   text,
 } from "drizzle-orm/pg-core";
 import { orderDetailSchema } from "./order-detail.schema";
-import { InferInsertModel, relations } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
 
 export const paymentMethod = pgTable("paymentMethod", {
   id: serial("id").primaryKey(),
   method: text("method").notNull(),
   price: numeric("price", { precision: 15, scale: 0 }),
-  fee: text("fee"),
+  fee: text("fee").notNull(),
   type: text("type").notNull(),
   transaction: numeric("transaction"),
   status: boolean("status").notNull().default(true),
@@ -29,3 +29,4 @@ export const paymentMethodRelations = relations(paymentMethod, ({ one }) => ({
 }));
 
 export type PaymentMethodProps = InferInsertModel<typeof paymentMethod>;
+export type PaymentSelectValues = InferSelectModel<typeof paymentMethod>;

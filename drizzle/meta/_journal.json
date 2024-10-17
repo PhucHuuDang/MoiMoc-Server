@@ -414,6 +414,13 @@
       "when": 1729174311917,
       "tag": "0058_daily_forgotten_one",
       "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1729176230165,
+      "tag": "0059_curvy_talkback",
+      "breakpoints": true
     }
   ]
 }
