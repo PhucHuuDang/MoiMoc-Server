@@ -36,6 +36,14 @@ export class ProductsController {
     return this.productService.findDetailProduct(productId);
   }
 
+  @Get("/search/:productId")
+  async justDataProduct(@Param("productId") productId: number) {
+    if (!productId) {
+      throw new BadRequestException("Invalid productId");
+    }
+    return this.productService.findDataProductItSelf(productId);
+  }
+
   @Post()
   createProduct(@Body() newProductProps: newProductProps) {
     console.log({ newProductProps });

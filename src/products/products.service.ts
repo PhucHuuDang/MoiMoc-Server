@@ -1,6 +1,11 @@
-import { Inject, Injectable, forwardRef } from "@nestjs/common";
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
-import { SQL, eq, inArray } from "drizzle-orm";
+import { SQL, eq, inArray, sql } from "drizzle-orm";
 import { CommentsService } from "src/comments/comments.service";
 import { DiscussionService } from "src/discussion/discussion.service";
 import { DRIZZLE } from "src/drizzle/drizzle.module";
@@ -170,6 +175,69 @@ export class ProductsService {
     console.log(productDetail);
 
     return productDetail;
+  }
+
+  async findDataProductItSelf(productId: number) {
+    if (!productId) {
+      throw new BadRequestException("Invalid productId");
+    }
+
+    const productFilter = this.db
+      .select({
+        productId: product.id,
+        productName: product.productName,
+        productDescription: product.productDescription,
+        details: product.details,
+        usage: product.usage,
+        expireDate: product.expireDate,
+        price: product.price,
+        discountPrice: product.discountPrice,
+        discountPercentage: product.discountPercentage,
+        quantity: product.quantity,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+        productType: {
+          id: productType.id,
+          type: productType.type,
+        },
+      })
+      .from(product)
+      .leftJoin(productType, eq(productType.id, product.productTypeId))
+      .where(eq(product.id, sql.placeholder("id")))
+      .prepare("productFilter");
+
+    if (!productFilter) {
+      return null;
+    }
+
+    const productImages =
+      await this.productImagesService.findImagesByProductId(productId);
+
+    const ingredientsProductDetail = this.db
+      .select({
+        ingredientId: ingredients.id,
+        ingredientName: ingredients.ingredient,
+      })
+      .from(ingredientsInProducts)
+      .leftJoin(
+        ingredients,
+        eq(ingredients.id, ingredientsInProducts.ingredientId)
+      )
+      .where(eq(ingredientsInProducts.productId, sql.placeholder("id")))
+      .prepare("ingredientsProductDetail");
+
+    const productData = await productFilter.execute({ id: productId });
+    const ingredientsInProduct = await ingredientsProductDetail.execute({
+      id: productId,
+    });
+
+    const resultData = {
+      ...productData[0],
+      ingredients: ingredientsInProduct,
+      productImages,
+    };
+
+    return resultData;
   }
 
   // * createProduct
