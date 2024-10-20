@@ -23,6 +23,7 @@ import { DiscussionModule } from "./discussion/discussion.module";
 import { RawBodyMiddleware } from "./raw-body.middleware";
 import { JsonBodyMiddleware } from "./json-body.middleware";
 import { DeliveryMethodsModule } from './delivery-methods/delivery-methods.module';
+import { PayosModule } from './payos/payos.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { DeliveryMethodsModule } from './delivery-methods/delivery-methods.modul
     PaymentMethodsModule,
     DiscussionModule,
     DeliveryMethodsModule,
+    PayosModule,
   ],
   controllers: [AppController],
   providers: [AppService, RawBodyMiddleware, JsonBodyMiddleware],

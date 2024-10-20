@@ -9,6 +9,7 @@ import {
   HttpException,
   HttpStatus,
   Put,
+  BadRequestException,
 } from "@nestjs/common";
 import { AddressService } from "./address.service";
 import { CreateAddressDto } from "./dto/create-address.dto";
@@ -21,6 +22,10 @@ export class AddressController {
 
   @Post()
   create(@Body() createAddressDto: InsertAddressProps) {
+    if (!createAddressDto.userId || !createAddressDto.address) {
+      throw new BadRequestException("User ID and Address are required");
+    }
+
     return this.addressService.create(createAddressDto);
   }
 
