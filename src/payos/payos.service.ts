@@ -14,7 +14,11 @@ export class PayosService {
     process.env.PAYOS_CHECKSUM_KEY
   );
   async createLinkPayment(checkoutValues: OrderValuesType) {
-    const amount = checkoutValues.products.reduce((acc, product) => {
+    // const discountPrice = price - (price * discountPercentage) / 100;
+
+    const discountCode = "MoiMoc10";
+
+    const price = checkoutValues.products.reduce((acc, product) => {
       return (
         acc +
         (product.discountPrice
@@ -22,6 +26,16 @@ export class PayosService {
           : Number(product.price))
       );
     }, 0);
+
+    let amount = price;
+    console.log({ price });
+    if (
+      discountCode.toUpperCase() === checkoutValues.discountCode?.toUpperCase()
+    ) {
+      amount = price - (price * 10) / 100;
+    }
+
+    console.log({ amount });
 
     const items = checkoutValues.products.map((product) => {
       return {

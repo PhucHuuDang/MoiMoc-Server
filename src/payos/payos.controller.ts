@@ -51,7 +51,7 @@ export class PayosController {
     const paymentLink =
       await this.payosService.createLinkPayment(checkoutValues);
 
-    return paymentLink;
+    return { paymentUrl: paymentLink };
   }
 
   @Post("/receive-hook")
