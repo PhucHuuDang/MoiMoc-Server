@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { CreateDiscussionDto } from "./dto/create-discussion.dto";
 import { UpdateDiscussionDto } from "./dto/update-discussion.dto";
 import { DRIZZLE } from "src/drizzle/drizzle.module";
@@ -28,8 +28,40 @@ export class DiscussionService {
     };
   }
 
-  findAll() {
-    return `This action returns all discussion`;
+  findDiscussions() {
+    // return this.db
+    //   .select({
+    //     id: discussion.id,
+    //     content: discussion.content,
+    //     createdAt: discussion.createdAt,
+    //     user: {
+    //       id: user.id,
+    //       name: user.name,
+    //       email: user.email,
+    //       avatar: user.avatar,
+    //     },
+    //   })
+    //   .from(discussion)
+    //   .leftJoin(user, eq(discussion.userId, user.id));
+
+    // const discussions = this.db.query.discussion.findMany({
+    //   with: {
+    //     user: true,
+    //   },
+    // });
+
+    try {
+      const discussions = this.db.query.discussion.findMany({
+        with: {
+          user: true,
+        },
+      });
+
+      return discussions;
+    } catch (error) {
+      console.error("Error fetching discussions:", error);
+      throw new HttpException("Error fetching discussions", 500);
+    }
   }
 
   async findOneDiscussionById(discussionId: number): Promise<

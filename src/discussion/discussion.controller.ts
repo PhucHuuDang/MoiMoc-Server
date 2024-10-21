@@ -43,8 +43,10 @@ export class DiscussionController {
   }
 
   @Get()
-  findAll() {
-    return this.discussionService.findAll();
+  findDiscussions() {
+    const discussions = this.discussionService.findDiscussions();
+
+    return discussions;
   }
 
   @Get(":discussionId")

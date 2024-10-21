@@ -49,7 +49,7 @@ export class PayosService {
 
     const body = {
       orderCode: Number(String(Date.now()).slice(-6)),
-      description: "Payment for products",
+      description: `Thanh toán cho ${items.length} đơn hàng của ${checkoutValues.user.name}`,
       amount,
       items,
       buyerName: checkoutValues.user.name,

@@ -26,6 +26,7 @@ export const user = pgTable("user", {
   password: varchar("password", { length: 255 }).notNull(),
   phoneAuth: varchar("phoneAuth", { length: 12 }).notNull().unique(),
   avatar: text("avatar"),
+  designation: text("designation"),
 
   createdAt: timestamp("createdAt", { mode: "string" }).defaultNow(),
   updatedAt: timestamp("updatedAt", { mode: "string" }).defaultNow(),
