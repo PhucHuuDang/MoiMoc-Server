@@ -22,6 +22,7 @@ export type OrderValuesType = {
     id: number;
     name: string;
     email: string | null;
+    designation: string | null;
     phoneAuth: string;
     avatar: string;
     role: string; // Enum for possible roles
