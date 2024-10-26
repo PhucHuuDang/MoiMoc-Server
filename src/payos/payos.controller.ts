@@ -60,19 +60,21 @@ export class PayosController {
 
     const { webhookUrl } = req.body;
 
+    console.log(req.body);
+
     console.log({ webhookUrl });
 
-    const result = await this.payOs.confirmWebhook(webhookUrl.toString());
-    console.log({ result });
-    try {
-      const webhookData = await this.payOs.verifyPaymentWebhookData(req.body); // Kiểm tra lỗi ở đây
-      console.log({ webhookData });
+    // const result = await this.payOs.confirmWebhook(webhookUrl.toString());
+    // console.log({ result });
+    // try {
+    //   const webhookData = await this.payOs.verifyPaymentWebhookData(req.body); // Kiểm tra lỗi ở đây
+    //   console.log({ webhookData });
 
-      return res.status(200).json({ success: true, data: webhookData });
-    } catch (error) {
-      console.error("Error processing webhook:", error);
-      return res.status(500).json({ success: false, message: error.message });
-    }
+    //   return res.status(200).json({ success: true, data: webhookData });
+    // } catch (error) {
+    //   console.error("Error processing webhook:", error);
+    //   return res.status(500).json({ success: false, message: error.message });
+    // }
   }
 
   @Get()

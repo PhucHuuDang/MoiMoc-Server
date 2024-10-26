@@ -369,7 +369,10 @@ export class ProductsService {
     // const productId = newProduct[0].productId;
 
     const transformedImages = images.map((url, index) => ({
-      imageId: existingProductImages[index]?.id,
+      // imageId: existingProductImages[index]?.id,
+      imageId: existingProductImages.find(
+        (img) => img.imageUrl === url.imageUrl
+      )?.id,
       productId: url.productId,
       imageUrl: url.imageUrl,
     }));

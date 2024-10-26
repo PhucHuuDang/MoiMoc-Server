@@ -10,7 +10,11 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: [process.env.LOCAL_DOMAIN, process.env.PRODUCTION_DOMAIN],
+    origin: [
+      process.env.LOCAL_DOMAIN,
+      process.env.PRODUCTION_DOMAIN,
+      process.env.MOIMOC_DOMAIN,
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
     allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
