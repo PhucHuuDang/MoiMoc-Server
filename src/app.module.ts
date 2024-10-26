@@ -24,6 +24,7 @@ import { RawBodyMiddleware } from "./raw-body.middleware";
 import { JsonBodyMiddleware } from "./json-body.middleware";
 import { DeliveryMethodsModule } from './delivery-methods/delivery-methods.module';
 import { PayosModule } from './payos/payos.module';
+import { AboutMoiMocModule } from './about-moi-moc/about-moi-moc.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { PayosModule } from './payos/payos.module';
     DiscussionModule,
     DeliveryMethodsModule,
     PayosModule,
+    AboutMoiMocModule,
   ],
   controllers: [AppController],
   providers: [AppService, RawBodyMiddleware, JsonBodyMiddleware],

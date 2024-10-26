@@ -17,3 +17,5 @@ export * from "./subscription.schema";
 export * from "./ingredients-in-products.schema";
 export * from "./discussion.schema";
 export * from "./users-orders.schema";
+export * from "./about-moi-moc.schema";
+export * from "./images-models.schema";
