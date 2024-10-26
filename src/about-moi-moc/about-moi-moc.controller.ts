@@ -33,12 +33,11 @@ export class AboutMoiMocController {
   }
 
   @Get()
-  findAll() {
-    return this.aboutMoiMocService.findAll();
+  findFirst() {
+    const result = this.aboutMoiMocService.findFirst();
+
+    return result;
   }
 
-  @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.aboutMoiMocService.findOne(+id);
-  }
+ 
 }

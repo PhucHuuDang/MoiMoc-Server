@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import { pgTable, serial, text } from "drizzle-orm/pg-core";
+import { imagesModelsSchema } from "./images-models.schema";
 
 export const aboutMoiMocSchema = pgTable("aboutMoiMoc", {
   id: serial("id").primaryKey().notNull(),
@@ -12,7 +13,7 @@ export const aboutMoiMocSchema = pgTable("aboutMoiMoc", {
 export const aboutMoiMocRelations = relations(
   aboutMoiMocSchema,
   ({ one, many }) => ({
-    imagesModels: many(aboutMoiMocSchema),
+    imagesModels: many(imagesModelsSchema),
   })
 );
 

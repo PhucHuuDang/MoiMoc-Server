@@ -74,6 +74,24 @@ export class AboutMoiMocService {
     }
   }
 
+  async findFirst() {
+    try {
+      const result = await this.db.query.aboutMoiMocSchema.findFirst({
+        with: {
+          imagesModels: true,
+        },
+      });
+
+      return result;
+    } catch (error) {
+      console.log({ error });
+
+      throw new InternalServerErrorException(
+        "InternalServerErrorException when finding first about moi moc"
+      );
+    }
+  }
+
   findAll() {
     return `This action returns all aboutMoiMoc`;
   }
