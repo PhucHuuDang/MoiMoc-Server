@@ -26,6 +26,7 @@ import { DeliveryMethodsModule } from './delivery-methods/delivery-methods.modul
 import { PayosModule } from './payos/payos.module';
 import { AboutMoiMocModule } from './about-moi-moc/about-moi-moc.module';
 import { ImagesModelsModule } from './images-models/images-models.module';
+import { FeedbackModule } from './feedback/feedback.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { ImagesModelsModule } from './images-models/images-models.module';
     PayosModule,
     AboutMoiMocModule,
     ImagesModelsModule,
+    FeedbackModule,
   ],
   controllers: [AppController],
   providers: [AppService, RawBodyMiddleware, JsonBodyMiddleware],

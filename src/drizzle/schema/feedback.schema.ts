@@ -12,6 +12,7 @@ export const feedback = pgTable("feedback", {
     .references(() => product.id)
     .notNull(),
   content: text("content").notNull(),
+  rating: integer("rating").notNull(),
 });
 
 export const feedbackRelations = relations(feedback, ({ one, many }) => ({
