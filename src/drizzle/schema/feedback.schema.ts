@@ -1,4 +1,4 @@
-import { integer, pgTable, serial, text } from "drizzle-orm/pg-core";
+import { integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./user.schema";
 import { product } from "./product.schema";
 import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
@@ -13,6 +13,8 @@ export const feedback = pgTable("feedback", {
     .notNull(),
   content: text("content").notNull(),
   rating: integer("rating").notNull(),
+  createdAt: timestamp("createdAt", { mode: "string" }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { mode: "string" }).notNull().defaultNow(),
 });
 
 export const feedbackRelations = relations(feedback, ({ one, many }) => ({
