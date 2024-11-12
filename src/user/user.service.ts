@@ -4,7 +4,12 @@ import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { DrizzleDbType } from "types/drizzle";
-import { NewUser, UserSelectTypes, user } from "src/drizzle/schema/user.schema";
+import {
+  NewUser,
+  UserInsertTypes,
+  UserSelectTypes,
+  user,
+} from "src/drizzle/schema/user.schema";
 import { DRIZZLE } from "src/drizzle/drizzle.module";
 import { phones } from "src/drizzle/schema/phones.schema";
 import { PhoneService } from "src/phone/phone.service";
@@ -49,20 +54,6 @@ export class UserService {
 
       const userId = insertDataUser[0].userId;
 
-      // const insertPhones = await this.db
-      //   .insert(phones)
-      //   .values({
-      //     userId: userId,
-      //     phone: phoneNumber,
-      //   })
-      //   .returning();
-
-      // console.log({ insertPhones });
-
-      // return {
-      //   user: insertDataUser[0],
-      //   phone: insertPhones,
-      // };
       return {
         user: insertDataUser[0].userId,
         message: "User created successfully",
@@ -88,7 +79,6 @@ export class UserService {
   }
 
   async findAllUserWithInfo() {
-    // return await this.db.select().from(user);
     return this.db.query.user.findMany({
       with: {
         phones: true,
@@ -144,6 +134,13 @@ export class UserService {
       .where(eq(user.phoneAuth, phoneAuth));
 
     return getUserByPhoneAuth[0];
+  }
+
+  async updateUserInfo(
+    values: UserInsertTypes & { email?: string },
+    userId: number
+  ) {
+    const { name, email, password, phoneAuth } = values;
   }
 
   async update(userId: number, updateUserDto: UpdateUserDto) {

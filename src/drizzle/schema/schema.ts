@@ -19,3 +19,4 @@ export * from "./discussion.schema";
 export * from "./users-orders.schema";
 export * from "./about-moi-moc.schema";
 export * from "./images-models.schema";
+export * from "./activity-user.schema";

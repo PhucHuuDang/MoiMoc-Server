@@ -15,6 +15,7 @@ import { comment } from "./comment.schema";
 import { createInsertSchema } from "drizzle-zod";
 import { feedback } from "./feedback.schema";
 import { discussion } from "./discussion.schema";
+import { activityUser } from "./activity-user.schema";
 
 export const userRole = pgEnum("role", ["ADMIN", "STAFF", "MEMBER"]);
 
@@ -27,6 +28,8 @@ export const user = pgTable("user", {
   phoneAuth: varchar("phoneAuth", { length: 12 }).notNull().unique(),
   avatar: text("avatar"),
   designation: text("designation"),
+  bio: varchar("bio", { length: 800 }),
+  website: varchar("website", { length: 255 }),
 
   createdAt: timestamp("createdAt", { mode: "string" }).defaultNow(),
   updatedAt: timestamp("updatedAt", { mode: "string" }).defaultNow(),
@@ -38,6 +41,7 @@ export const userRelations = relations(user, ({ one, many }) => ({
   comments: many(comment),
   discussion: many(discussion),
   feedbacks: many(feedback),
+  activities: many(activityUser),
 }));
 
 export const userZod = createInsertSchema(user, {
@@ -58,6 +62,7 @@ export type NewUser = typeof user.$inferInsert & {
 };
 
 export type UserSelectTypes = InferSelectModel<typeof user>;
+export type UserInsertTypes = typeof user.$inferInsert;
 
 // export type UserShapeType = z.infer<typeof userZod>;
 // export type UserShapeType = InferSelectModel<typeof user>;
