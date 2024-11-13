@@ -21,6 +21,7 @@ import { PhoneService } from "src/phone/phone.service";
 import { createId } from "@paralleldrive/cuid2";
 import { AddressService } from "src/address/address.service";
 import { comment } from "src/drizzle/schema/comment.schema";
+import { activityUser } from "src/drizzle/schema/activity-user.schema";
 
 const saltOrRounds: number = 10;
 
@@ -166,6 +167,43 @@ export class UserService {
       if (!isExistUser[0]) {
         throw new HttpException("User not found", 404);
       }
+
+      // const updateUser = await this.db
+      //   .update(user)
+      //   .set({
+      //     name,
+      //     email,
+      //     phoneAuth,
+      //     website,
+      //     bio,
+      //     designation,
+      //   } as Partial<UserInsertTypes>)
+      //   .where(eq(user.id, userId))
+      //   .returning();
+
+      const updateUserProfile = await this.db
+        .update(user)
+        .set({
+          name,
+          email,
+          website,
+          bio,
+          designation,
+        } as Partial<UserInsertTypes>)
+        .where(eq(user.id, userId))
+        .returning();
+
+      const activity = await this.db
+        .insert(activityUser)
+        .values({
+          userId,
+          activity: `Bạn đã cập nhật thông tin cá nhân`,
+        })
+        .returning();
+
+      return {
+        message: `Profile updated successfully for user ${updateUserProfile[0].name}`,
+      };
     } catch (error) {
       console.log({ error });
       throw new InternalServerErrorException("Error updating profile for user");
@@ -192,6 +230,14 @@ export class UserService {
           avatar,
         } as Partial<UserInsertTypes>)
         .where(eq(user.id, userId))
+        .returning();
+
+      const activity = await this.db
+        .insert(activityUser)
+        .values({
+          userId,
+          activity: `Bạn đã cập nhật ảnh đại diện`,
+        })
         .returning();
 
       return {

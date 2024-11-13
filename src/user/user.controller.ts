@@ -78,7 +78,7 @@ export class UserController {
       designation,
     });
 
-    return "This action updates a #${userId} user";
+    // return "This action updates a #${userId} user";
   }
 
   @UseGuards(JwtAuthGuard)
