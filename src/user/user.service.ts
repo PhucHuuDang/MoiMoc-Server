@@ -1,6 +1,11 @@
 import { eq } from "drizzle-orm";
 import * as bcrypt from "bcrypt";
-import { HttpException, Inject, Injectable } from "@nestjs/common";
+import {
+  HttpException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { DrizzleDbType } from "types/drizzle";
@@ -137,10 +142,65 @@ export class UserService {
   }
 
   async updateUserInfo(
-    values: UserInsertTypes & { email?: string },
-    userId: number
+    userId: number,
+    values: Omit<UserInsertTypes, "password"> & {
+      email?: string;
+      website?: string;
+      bio?: string;
+      designation?: string;
+      address: string;
+    }
   ) {
-    const { name, email, password, phoneAuth } = values;
+    const { name, email, phoneAuth, website, bio, address, designation } =
+      values;
+
+    try {
+      const isExistUser = await this.db
+        .select({
+          userId: user.id,
+        })
+        .from(user)
+        .where(eq(user.id, userId))
+        .limit(1);
+
+      if (!isExistUser[0]) {
+        throw new HttpException("User not found", 404);
+      }
+    } catch (error) {
+      console.log({ error });
+      throw new InternalServerErrorException("Error updating profile for user");
+    }
+  }
+
+  async updateAvatarUser(userId: number, avatar: string) {
+    try {
+      const isExistUser = await this.db
+        .select({
+          userId: user.id,
+        })
+        .from(user)
+        .where(eq(user.id, userId))
+        .limit(1);
+
+      if (!isExistUser[0]) {
+        throw new HttpException("User not found", 404);
+      }
+
+      const updateAvatar = await this.db
+        .update(user)
+        .set({
+          avatar,
+        } as Partial<UserInsertTypes>)
+        .where(eq(user.id, userId))
+        .returning();
+
+      return {
+        message: `Avatar updated successfully for user ${updateAvatar[0].name}`,
+      };
+    } catch (error) {
+      console.log({ error });
+      throw new InternalServerErrorException("Error updating avatar for user");
+    }
   }
 
   async update(userId: number, updateUserDto: UpdateUserDto) {

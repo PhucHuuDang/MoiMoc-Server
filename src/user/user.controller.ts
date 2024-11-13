@@ -57,9 +57,44 @@ export class UserController {
     return this.userService.findUserDetail(+userId);
   }
 
-  @Put(":userId")
-  updateUserInfo(@Param("userId") userId: number, @Body() updateUser: any) {
+  @UseGuards(JwtAuthGuard)
+  @Put("profile")
+  updateUserInfo(@Req() req: any) {
+    const userId = req.user.id;
+    const { name, email, phoneAuth, address, website, bio, designation } =
+      req.body;
+
+    if (!userId) {
+      throw new HttpException("User ID is required", HttpStatus.BAD_REQUEST);
+    }
+
+    return this.userService.updateUserInfo(userId, {
+      name,
+      email,
+      phoneAuth,
+      address,
+      website,
+      bio,
+      designation,
+    });
+
     return "This action updates a #${userId} user";
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put("avatar")
+  async updateAvatarUser(@Req() req: any) {
+    const userId = req.user.id;
+
+    const body = req.body;
+
+    const { avatar } = body;
+
+    if (!userId) {
+      throw new HttpException("User ID is required", HttpStatus.BAD_REQUEST);
+    }
+
+    return await this.userService.updateAvatarUser(userId, avatar);
   }
 
   @UseGuards(JwtAuthGuard)
