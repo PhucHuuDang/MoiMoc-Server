@@ -27,6 +27,7 @@ import { PayosModule } from './payos/payos.module';
 import { AboutMoiMocModule } from './about-moi-moc/about-moi-moc.module';
 import { ImagesModelsModule } from './images-models/images-models.module';
 import { FeedbackModule } from './feedback/feedback.module';
+import { ActivityModule } from './activity/activity.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { FeedbackModule } from './feedback/feedback.module';
     AboutMoiMocModule,
     ImagesModelsModule,
     FeedbackModule,
+    ActivityModule,
   ],
   controllers: [AppController],
   providers: [AppService, RawBodyMiddleware, JsonBodyMiddleware],
