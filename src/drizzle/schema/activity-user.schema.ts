@@ -17,7 +17,7 @@ export const activityUser = pgTable("activity_user", {
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
 
   createdAt: timestamp("createdAt", { mode: "string" }).defaultNow(),
-  updatedAt: timestamp("createdAt", { mode: "string" }).defaultNow(),
+  updatedAt: timestamp("updatedAt", { mode: "string" }).defaultNow(),
 });
 
 export const activityUserRelations = relations(

@@ -228,17 +228,20 @@ export class UserService {
         .update(user)
         .set({
           avatar,
+          updatedAt: new Date(),
         } as Partial<UserInsertTypes>)
         .where(eq(user.id, userId))
         .returning();
 
-      const activity = await this.db
-        .insert(activityUser)
-        .values({
-          userId,
-          activity: `Bạn đã cập nhật ảnh đại diện`,
-        })
-        .returning();
+      if (updateAvatar[0].id) {
+        await this.db
+          .insert(activityUser)
+          .values({
+            userId: updateAvatar[0].id,
+            activity: `test`,
+          })
+          .returning();
+      }
 
       return {
         message: `Avatar updated successfully for user ${updateAvatar[0].name}`,
