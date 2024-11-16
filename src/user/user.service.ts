@@ -238,7 +238,7 @@ export class UserService {
           .insert(activityUser)
           .values({
             userId: updateAvatar[0].id,
-            activity: `test`,
+            activity: `Bạn đã cập nhật ảnh đại diện`,
           })
           .returning();
       }
