@@ -5,6 +5,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
@@ -249,6 +250,29 @@ export class UserService {
     } catch (error) {
       console.log({ error });
       throw new InternalServerErrorException("Error updating avatar for user");
+    }
+  }
+
+  async getUserActivities(userId: number) {
+    const isExistUser = await this.db.query.user.findFirst({
+      where: (user, { eq }) => eq(user.id, userId),
+    });
+
+    if (!isExistUser) {
+      throw new NotFoundException("User not found");
+    }
+
+    try {
+      const activities = await this.db.query.activityUser.findMany({
+        where: (activityUser, { eq }) => eq(activityUser.userId, userId),
+        orderBy: (activityUser, { asc }) => [asc(activityUser.createdAt)],
+      });
+
+      return activities;
+    } catch (error) {
+      console.log({ error });
+
+      throw new InternalServerErrorException("Error fetching user activities");
     }
   }
 

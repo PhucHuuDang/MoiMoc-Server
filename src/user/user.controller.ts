@@ -58,6 +58,18 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get("activities")
+  async getUserActivities(@Req() req: any) {
+    const userId = req.user.id;
+
+    if (!userId) {
+      throw new HttpException("User ID is required", HttpStatus.BAD_REQUEST);
+    }
+    const activities = await this.userService.getUserActivities(userId);
+    return activities;
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Put("profile")
   updateUserInfo(@Req() req: any) {
     const userId = req.user.id;
