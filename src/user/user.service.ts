@@ -109,29 +109,47 @@ export class UserService {
   }
 
   async findUserDetail(userId: number) {
-    const userDetail = await this.db
-      .select({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        phoneAuth: user.phoneAuth,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      })
-      .from(user)
-      .where(eq(user.id, userId))
-      .limit(1);
+    try {
+      const isExistUser = await this.db.query.user.findFirst({
+        where: (user, { eq }) => eq(user.id, userId),
+      });
 
-    const phonesUser = await this.phoneService.findPhonesByUserId(userId);
-    const addressUser = await this.addressService.findUserAddresses(userId);
+      const userDetail = await this.db
+        .select({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          avatar: user.avatar,
+          website: user.website,
+          bio: user.bio,
+          designation: user.designation,
+          phoneAuth: user.phoneAuth,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        })
+        .from(user)
+        .where(eq(user.id, userId))
+        .limit(1);
 
-    const userDetailWithInfo = {
-      user: userDetail[0],
-      phones: phonesUser,
-      address: addressUser,
-    };
+      const phonesUser = await this.phoneService.findPhonesByUserId(userId);
+      const addressUser = await this.addressService.findUserAddresses(userId);
+      const activities = await this.db.query.activityUser.findMany({
+        where: (activityUser, { eq }) => eq(activityUser.userId, userId),
+        orderBy: (activityUser, { asc }) => [asc(activityUser.createdAt)],
+      });
 
-    return userDetailWithInfo;
+      const userDetailWithInfo = {
+        user: userDetail[0],
+        phones: phonesUser,
+        address: addressUser,
+        activities,
+      };
+
+      return userDetailWithInfo;
+    } catch (error) {
+      console.log({ error });
+      throw new InternalServerErrorException("Error fetching user detail");
+    }
   }
 
   async findUserByPhoneAuth(phoneAuth: string): Promise<UserSelectTypes> {
@@ -168,19 +186,6 @@ export class UserService {
       if (!isExistUser[0]) {
         throw new HttpException("User not found", 404);
       }
-
-      // const updateUser = await this.db
-      //   .update(user)
-      //   .set({
-      //     name,
-      //     email,
-      //     phoneAuth,
-      //     website,
-      //     bio,
-      //     designation,
-      //   } as Partial<UserInsertTypes>)
-      //   .where(eq(user.id, userId))
-      //   .returning();
 
       const updateUserProfile = await this.db
         .update(user)
@@ -250,29 +255,6 @@ export class UserService {
     } catch (error) {
       console.log({ error });
       throw new InternalServerErrorException("Error updating avatar for user");
-    }
-  }
-
-  async getUserActivities(userId: number) {
-    const isExistUser = await this.db.query.user.findFirst({
-      where: (user, { eq }) => eq(user.id, userId),
-    });
-
-    if (!isExistUser) {
-      throw new NotFoundException("User not found");
-    }
-
-    try {
-      const activities = await this.db.query.activityUser.findMany({
-        where: (activityUser, { eq }) => eq(activityUser.userId, userId),
-        orderBy: (activityUser, { asc }) => [asc(activityUser.createdAt)],
-      });
-
-      return activities;
-    } catch (error) {
-      console.log({ error });
-
-      throw new InternalServerErrorException("Error fetching user activities");
     }
   }
 

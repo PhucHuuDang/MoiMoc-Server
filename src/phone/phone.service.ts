@@ -47,10 +47,10 @@ export class PhoneService {
   }
 
   async findPhonesByUserId(userId: number): Promise<PhoneSelectTypes[]> {
-    const userPhones = await this.db
-      .select()
-      .from(phones)
-      .where(eq(phones.userId, userId));
+    const userPhones = await this.db.query.phones.findMany({
+      where: (phones, { eq }) => eq(phones.userId, userId),
+      orderBy: (phones, { asc }) => [asc(phones.createdAt)],
+    });
 
     return userPhones;
   }

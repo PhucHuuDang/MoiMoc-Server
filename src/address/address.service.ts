@@ -24,10 +24,10 @@ export class AddressService {
   }
 
   async findUserAddresses(userId: number) {
-    const addresses = await this.db
-      .select()
-      .from(address)
-      .where(eq(address.userId, userId));
+    const addresses = await this.db.query.address.findMany({
+      where: (address, { eq }) => eq(address.userId, userId),
+      orderBy: (address, { asc }) => [asc(address.createdAat)],
+    });
 
     return addresses;
   }
