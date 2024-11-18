@@ -163,15 +163,15 @@ export class UserService {
 
   async updateUserInfo(
     userId: number,
-    values: Omit<UserInsertTypes, "password"> & {
+    values: Omit<UserInsertTypes, "password" | "phoneAuth"> & {
       email?: string;
-      website?: string;
-      bio?: string;
-      designation?: string;
-      address: string;
+      website?: string | null;
+      bio?: string | null;
+      designation?: string | null;
+      address?: string | null;
     }
   ) {
-    const { name, email, phoneAuth, website, bio, address, designation } =
+    const { name, email,  website, bio, address, designation } =
       values;
 
     try {

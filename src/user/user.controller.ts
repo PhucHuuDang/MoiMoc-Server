@@ -62,8 +62,7 @@ export class UserController {
   @Put("profile")
   updateUserInfo(@Req() req: any) {
     const userId = req.user.id;
-    const { name, email, phoneAuth, address, website, bio, designation } =
-      req.body;
+    const { name, email, address, website, bio, designation } = req.body;
 
     if (!userId) {
       throw new HttpException("User ID is required", HttpStatus.BAD_REQUEST);
@@ -72,14 +71,11 @@ export class UserController {
     return this.userService.updateUserInfo(userId, {
       name,
       email,
-      phoneAuth,
       address,
       website,
       bio,
       designation,
     });
-
-    // return "This action updates a #${userId} user";
   }
 
   @UseGuards(JwtAuthGuard)
