@@ -87,10 +87,10 @@ export class UserService {
 
   async findAllUserWithInfo() {
     return this.db.query.user.findMany({
-      with: {
-        phones: true,
-        address: true,
-      },
+      // with: {
+      //   phones: true,
+      //   address: true,
+      // },
     });
   }
 
@@ -171,8 +171,7 @@ export class UserService {
       address?: string | null;
     }
   ) {
-    const { name, email,  website, bio, address, designation } =
-      values;
+    const { name, email, website, bio, address, designation } = values;
 
     try {
       const isExistUser = await this.db

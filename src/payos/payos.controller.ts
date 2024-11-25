@@ -54,15 +54,20 @@ export class PayosController {
     return { paymentUrl: paymentLink };
   }
 
+  //* https://1051-116-110-43-211.ngrok-free.app/payos/receive-hook
   @Post("/receive-hook")
   async webhookData(@Req() req: any, @Res() res: any) {
     console.log("Received webhook data:", req); // Kiểm tra nội dung req.body
 
-    const { webhookUrl } = req.body;
-
     console.log(req.body);
+    const webhookData = this.payOs.verifyPaymentWebhookData(req.body);
+    console.log({ webhookData });
 
-    console.log({ webhookUrl });
+    const paymentLinkInformation = await this.payOs.getPaymentLinkInformation(
+      webhookData.paymentLinkId
+    );
+
+    console.log({ paymentLinkInformation });
 
     // const result = await this.payOs.confirmWebhook(webhookUrl.toString());
     // console.log({ result });
@@ -121,3 +126,27 @@ export class PayosController {
   //   }
   // }
 }
+
+// body: {
+//   code: '00',
+//   desc: 'success',
+//   data: {
+//     orderCode: 123,
+//     amount: 3000,
+//     description: 'VQRIO123',
+//     accountNumber: '12345678',
+//     reference: 'TF230204212323',
+//     transactionDateTime: '2023-02-04 18:25:00',
+//     paymentLinkId: '124c33293c43417ab7879e14c8d9eb18',
+//     code: '00',
+//     desc: 'Thành công',
+//     counterAccountBankId: '',
+//     counterAccountBankName: '',
+//     counterAccountName: '',
+//     counterAccountNumber: '',
+//     virtualAccountName: '',
+//     virtualAccountNumber: '',
+//     currency: 'VND'
+//   },
+//   signature: 'b35cb1c2fd1d9d59c0e50aa80be5d3bc473a75af048fdb6704cb1f8a8a18207b'
+// },
