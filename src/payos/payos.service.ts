@@ -56,8 +56,8 @@ export class PayosService {
       buyerEmail: checkoutValues.user.email,
       buyerPhone: checkoutValues.phone,
       buyerAddress: checkoutValues.address,
-      returnUrl: "https://moi-moc-client.vercel.app/success",
-      cancelUrl: "https://moi-moc-client.vercel.app/cancel",
+      returnUrl: "https://www.moimoc.shop/success",
+      cancelUrl: "https://www.moimoc.shop/cancel",
     };
 
     try {
