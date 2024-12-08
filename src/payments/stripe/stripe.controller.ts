@@ -87,85 +87,91 @@ export class StripeController {
     @Res() res: Response,
     @RawBody() rawBody: Buffer
   ) {
-    let event: Stripe.Event;
-
-    console.log({ req });
-    console.log(req.body);
     console.log(req.rawBody);
-
     console.log({ rawBody });
 
-    const signInSecretLocal =
-      "whsec_7c5951bf1e6c8fac053e102d1970b46cbd13ee010bf28a865cd2275de4c86375";
-
-    console.log(process.env.WEBHOOK_SECRET_KEY, { signature });
-
-    console.log(req.body.toString("utf8"));
     const raw = req.body.toString("utf8");
-    const rawTest = req.body.toString();
 
-    console.log({ raw });
+    return await this.stripeService.webhookData(signature, raw);
 
-    console.log({ rawTest });
+    // let event: Stripe.Event;
 
-    try {
-      // const rawBody = JSON.stringify(req.body);
-      event = this.stripe.webhooks.constructEvent(
-        raw,
-        signature,
-        signInSecretLocal
-      );
-    } catch (error) {
-      console.log("webhook error: ", error);
-      // console.error("Webhook signature verification failed.");
-      throw new HttpException("Webhook signature verification failed.", 400);
-    }
+    // console.log({ req });
+    // console.log(req.body);
+    // console.log(req.rawBody);
 
-    const session = event.data.object as Stripe.Checkout.Session;
+    // console.log({ rawBody });
 
-    console.log({ session });
+    // const signInSecretLocal =
+    //   "whsec_7c5951bf1e6c8fac053e102d1970b46cbd13ee010bf28a865cd2275de4c86375";
 
-    //* the account of the user
-    // if (!session.metadata.phoneAuth) {
-    //   throw new HttpException("User not authenticated", 400);
+    // console.log(process.env.WEBHOOK_SECRET_KEY, { signature });
+
+    // const raw = req.body.toString("utf8");
+    // const rawTest = req.body.toString();
+
+    // console.log({ raw });
+
+    // console.log({ rawTest });
+
+    // try {
+    //   // const rawBody = JSON.stringify(req.body);
+    //   event = this.stripe.webhooks.constructEvent(
+    //     raw,
+    //     signature,
+    //     signInSecretLocal
+    //   );
+    // } catch (error) {
+    //   console.log("webhook error: ", error);
+    //   // console.error("Webhook signature verification failed.");
+    //   throw new HttpException("Webhook signature verification failed.", 400);
     // }
 
-    if (event.type === "payment_intent.succeeded") {
-      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+    // const session = event.data.object as Stripe.Checkout.Session;
 
-      try {
-        const paymentData = await this.stripe.paymentIntents.retrieve(
-          paymentIntent.id as string
-        );
+    // console.log({ session });
 
-        console.log(paymentData.metadata);
-      } catch (error) {}
-    }
+    // //* the account of the user
+    // // if (!session.metadata.phoneAuth) {
+    // //   throw new HttpException("User not authenticated", 400);
+    // // }
 
-    switch (event.type) {
-      case "payment_intent.succeeded":
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+    // if (event.type === "payment_intent.succeeded") {
+    //   const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
-        console.log({ paymentIntent });
-        console.log(
-          `PaymentIntent for ${paymentIntent.amount} was successful!`
-        );
+    //   try {
+    //     const paymentData = await this.stripe.paymentIntents.retrieve(
+    //       paymentIntent.id as string
+    //     );
 
-        break;
+    //     console.log(paymentData.metadata);
+    //   } catch (error) {}
+    // }
 
-      case "payment_method.attached":
-        const paymentMethod = event.data.object;
+    // switch (event.type) {
+    //   case "payment_intent.succeeded":
+    //     const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
-        console.log({ paymentMethod });
-        // Then define and call a method to handle the successful attachment of a PaymentMethod.
-        // handlePaymentMethodAttached(paymentMethod);
-        break;
+    //     console.log({ paymentIntent });
+    //     console.log(
+    //       `PaymentIntent for ${paymentIntent.amount} was successful!`
+    //     );
 
-      default:
-        console.error(`Unhandled event type: ${event.type}`);
-    }
+    //     break;
 
-    res.status(200).json({ received: true });
+    //   case "payment_method.attached":
+    //     const paymentMethod = event.data.object;
+
+    //     console.log({ paymentMethod });
+    //     // Then define and call a method to handle the successful attachment of a PaymentMethod.
+    //     // handlePaymentMethodAttached(paymentMethod);
+    //     break;
+
+    //   default:
+    //     console.error(`Unhandled event type: ${event.type}`);
+    // }
+
+    // res.status(200).json({ received: true });
   }
 
   @Get("balance")

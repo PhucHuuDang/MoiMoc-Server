@@ -1,12 +1,31 @@
 import { product } from "./../../drizzle/schema/product.schema";
-import { HttpException, Inject, Injectable } from "@nestjs/common";
+import {
+  HttpException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import Stripe from "stripe";
 import { OrderValuesType, ProductValuesType } from "./types/stripe-types";
 import { absoluteUrl } from "../lib/absolute-url";
 import { DRIZZLE } from "src/drizzle/drizzle.module";
 import { DrizzleDbType } from "types/drizzle";
 import { subscription } from "src/drizzle/schema/subscription.schema";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
+
+import { user as userSchema } from "../../drizzle/schema/user.schema";
+import { orderDetailSchema } from "src/drizzle/schema/order-detail.schema";
+import { usersOrders } from "src/drizzle/schema/users-orders.schema";
+import { orderProducts } from "src/drizzle/schema/order-products";
+
+interface Metadata {
+  user: string;
+  products: string;
+  address: string;
+  phone: string;
+  method: string;
+  paymentMethod: string;
+}
 
 @Injectable()
 export class StripeService {
@@ -16,6 +35,56 @@ export class StripeService {
       apiVersion: "2024-06-20",
       typescript: true,
     });
+  }
+
+  private async customerOrdered(
+    paymentIntendId: string,
+    metadata: Stripe.Metadata,
+    amount: number
+  ) {
+    const { user, products, address, phone, method, paymentMethod } = metadata;
+
+    const { id: userId } = JSON.parse(user);
+
+    const orderDetail = await this.db
+      .insert(orderDetailSchema)
+      .values({
+        totalAmount: amount,
+        paymentMethodId: Number(paymentMethod),
+        deliveryMethodId: Number(method),
+      })
+      .returning({ orderDetailId: orderDetailSchema.id });
+
+    const userSubscription = await this.db.insert(subscription).values({
+      stripeCustomerId: userId,
+      stripeSubscriptionId: paymentIntendId,
+      stripPriceId: amount.toString(),
+      stripeCurrentPeriodEnd: "",
+      orderDetailId: orderDetail[0].orderDetailId,
+    });
+
+    const userOrders = await this.db.insert(usersOrders).values({
+      userId,
+      orderDetailId: orderDetail[0].orderDetailId,
+    });
+
+    const productId = JSON.parse(products).map((product) => {
+      return {
+        orderDetailId: orderDetail[0].orderDetailId,
+        productId: product.productId,
+      };
+    });
+    const orderProductsInsert = await this.db
+      .insert(orderProducts)
+      .values(productId);
+
+    // const customers = await
+
+    return {
+      message: "Order successfully",
+    };
+
+    // return customers.data;
   }
 
   async createProduct(productValues: ProductValuesType) {
@@ -43,11 +112,6 @@ export class StripeService {
       product,
       productPrice,
     };
-
-    // return await this.stripe.products.create({
-    //   name: productName,
-    //   description,
-    // });
   }
 
   async getProduct(productId: string) {
@@ -88,6 +152,9 @@ export class StripeService {
   }
 
   async createCheckoutSession(checkoutValues: OrderValuesType, userId: string) {
+    const successUrl = process.env.MOIMOC_DOMAIN;
+    const cancelUrl = process.env.MOIMOC_DOMAIN;
+
     let url = "";
 
     const { user, address, phone, method, paymentMethod, products } =
@@ -95,10 +162,27 @@ export class StripeService {
 
     const { avatar, ...info } = user;
 
-    // const successUrl = absoluteUrl("/success?session_id={CHECKOUT_SESSION_ID}");
-    const successUrl = "https://moi-moc-client.vercel.app/";
-    // const cancelUrl = absoluteUrl("/cancel?session_id={CHECKOUT_SESSION_ID}");
-    const cancelUrl = "https://moi-moc-client.vercel.app/";
+    const isExistUser = await this.db.query.user.findFirst({
+      where: (userSchema, { eq }) => eq(userSchema.id, Number(userId)),
+    });
+
+    if (!isExistUser) {
+      throw new NotFoundException("User invalid.");
+    }
+
+    const isExistingProducts = await this.db
+      .select()
+      .from(product)
+      .where(
+        inArray(
+          product,
+          products.map((product) => product.productId)
+        )
+      );
+
+    if (isExistingProducts.length === 0) {
+      throw new NotFoundException("Sản phẩm không tồn tại");
+    }
 
     const metadata = {
       user: JSON.stringify(info),
@@ -116,29 +200,34 @@ export class StripeService {
       paymentMethod,
     };
 
+    const orderedProducts = products.filter((product) => {
+      return isExistingProducts.find((existingProduct) => {
+        return existingProduct.id === product.productId;
+      });
+    });
+
+    const line_items = orderedProducts.map((product) => {
+      return {
+        price_data: {
+          currency: "VND",
+          product_data: {
+            name: product.productName,
+            description: product.productDescription,
+            images: [product.imageUrl],
+          },
+          unit_amount: product.discountPrice
+            ? Number(product.discountPrice)
+            : Number(product.price),
+        },
+        quantity: Number(product.quantityOrder),
+      };
+    });
+
     try {
       const userSubscription = await this.db
         .select()
         .from(subscription)
         .where(eq(subscription.stripeCustomerId, userId));
-
-      const line_items = products.map((product) => {
-        return {
-          price_data: {
-            currency: "VND",
-            product_data: {
-              name: product.productName,
-              description: product.productDescription,
-              images: [product.imageUrl],
-            },
-            unit_amount: product.discountPrice
-              ? Number(product.discountPrice)
-              : Number(product.price),
-            // recurring: { interval: "" },
-          },
-          quantity: Number(product.quantityOrder),
-        };
-      });
 
       if (userSubscription[0] && userSubscription[0].stripeCustomerId) {
         const stripeSession = await this.stripe.billingPortal.sessions.create({
@@ -153,13 +242,7 @@ export class StripeService {
           mode: "payment",
           billing_address_collection: "auto",
           customer_email: user.email || null,
-          // invoice_creation: {
-          //   enabled: true,
-          // },
           metadata,
-          // shipping_address_collection: {
-          //   allowed_countries: ["US", "VN"],
-          // },
           line_items: line_items,
 
           success_url: successUrl,
@@ -176,6 +259,78 @@ export class StripeService {
       console.error(error);
       throw new HttpException("Thanh toán thất bại", 500);
     }
+  }
+
+  async webhookData(raw: any, signature: string) {
+    let event: Stripe.Event;
+
+    const signInSecretLocal =
+      "whsec_7c5951bf1e6c8fac053e102d1970b46cbd13ee010bf28a865cd2275de4c86375";
+
+    try {
+      // const rawBody = JSON.stringify(req.body);
+      event = this.stripe.webhooks.constructEvent(
+        raw,
+        signature,
+        signInSecretLocal
+      );
+    } catch (error) {
+      console.log("webhook error: ", error);
+      // console.error("Webhook signature verification failed.");
+      throw new HttpException("Webhook signature verification failed.", 400);
+    }
+
+    const session = event.data.object as Stripe.Checkout.Session;
+
+    console.log({ session });
+
+    //* the account of the user
+    // if (!session.metadata.phoneAuth) {
+    //   throw new HttpException("User not authenticated", 400);
+    // }
+
+    // if (event.type === "payment_intent.succeeded") {
+    //   const paymentIntent = event.data.object as Stripe.PaymentIntent;
+
+    //   const { id: paymentIntendId, metadata } = paymentIntent;
+
+    //   try {
+    //     const paymentData = await this.stripe.paymentIntents.retrieve(
+    //       paymentIntent.id as string
+    //     );
+
+    //     console.log(paymentData.metadata);
+    //   } catch (error) {}
+    // }
+
+    switch (event.type) {
+      case "payment_intent.succeeded":
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+
+        const { id: paymentIntendId, metadata, amount } = paymentIntent;
+
+        this.customerOrdered(paymentIntendId, metadata, amount);
+
+        console.log({ paymentIntent });
+        console.log(
+          `PaymentIntent for ${paymentIntent.amount} was successful!`
+        );
+
+        break;
+
+      case "payment_method.attached":
+        const paymentMethod = event.data.object;
+
+        console.log({ paymentMethod });
+        // Then define and call a method to handle the successful attachment of a PaymentMethod.
+        // handlePaymentMethodAttached(paymentMethod);
+        break;
+
+      default:
+        console.error(`Unhandled event type: ${event.type}`);
+    }
+
+    // res.status(200).json({ received: true });
   }
 
   async retrieveBalance() {
