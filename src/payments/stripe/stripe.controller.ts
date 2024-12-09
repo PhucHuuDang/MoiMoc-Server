@@ -42,6 +42,11 @@ export class StripeController {
     return result;
   }
 
+  @Get("/test")
+  test() {
+    return this.stripeService.testEnv();
+  }
+
   @UseGuards(JwtAuthGuard)
   @Post("/payment")
   async createCheckoutSession(

@@ -151,6 +151,10 @@ export class StripeService {
     return productsWithPrices;
   }
 
+  testEnv() {
+    console.log(process.env.MOIMOC_DOMAIN);
+  }
+
   async createCheckoutSession(checkoutValues: OrderValuesType, userId: string) {
     const successUrl = process.env.MOIMOC_DOMAIN;
     const cancelUrl = process.env.MOIMOC_DOMAIN;
@@ -170,15 +174,12 @@ export class StripeService {
       throw new NotFoundException("User invalid.");
     }
 
+    const getProductId = products.map((product) => Number(product.productId));
+
     const isExistingProducts = await this.db
       .select()
       .from(product)
-      .where(
-        inArray(
-          product,
-          products.map((product) => product.productId)
-        )
-      );
+      .where(inArray(product.id, getProductId));
 
     if (isExistingProducts.length === 0) {
       throw new NotFoundException("Sản phẩm không tồn tại");
