@@ -35,7 +35,7 @@ async function bootstrap() {
   //     req.rawBody = req.body;
   //     next();
   //   }
-  // )
+  // );
 
   // const rawBodyBuffer = (req, res, buffer, encoding) => {
   //   if (!req.headers["stripe-signature"]) {

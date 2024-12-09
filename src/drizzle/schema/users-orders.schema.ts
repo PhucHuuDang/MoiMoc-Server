@@ -36,4 +36,4 @@ export const usersOrdersRelations = relations(usersOrders, ({ one, many }) => ({
   }),
 }));
 
-export type UsersOrdersValues = InferInsertModel<typeof usersOrders>;
+export type UserOrdersInsert = InferInsertModel<typeof usersOrders>;

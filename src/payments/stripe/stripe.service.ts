@@ -3,6 +3,7 @@ import {
   HttpException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from "@nestjs/common";
 import Stripe from "stripe";
@@ -44,47 +45,79 @@ export class StripeService {
   ) {
     const { user, products, address, phone, method, paymentMethod } = metadata;
 
-    const { id: userId } = JSON.parse(user);
+    console.log({ paymentIntendId, metadata, amount });
 
-    const orderDetail = await this.db
-      .insert(orderDetailSchema)
-      .values({
-        totalAmount: amount,
-        paymentMethodId: Number(paymentMethod),
-        deliveryMethodId: Number(method),
-      })
-      .returning({ orderDetailId: orderDetailSchema.id });
+    const userId = Number(user);
 
-    const userSubscription = await this.db.insert(subscription).values({
-      stripeCustomerId: userId,
-      stripeSubscriptionId: paymentIntendId,
-      stripPriceId: amount.toString(),
-      stripeCurrentPeriodEnd: "",
-      orderDetailId: orderDetail[0].orderDetailId,
-    });
+    console.log(JSON.parse(user));
+    console.log({ userId });
 
-    const userOrders = await this.db.insert(usersOrders).values({
-      userId,
-      orderDetailId: orderDetail[0].orderDetailId,
-    });
+    try {
+      const orderDetail = await this.db
+        .insert(orderDetailSchema)
+        .values({
+          totalAmount: amount,
+          paymentMethodId: 1,
+          deliveryMethodId: 1,
+        })
+        .returning({ orderDetailId: orderDetailSchema.id });
 
-    const productId = JSON.parse(products).map((product) => {
+      console.log("userOrders", orderDetail[0]);
+
+      const userOrders = await this.db
+        .insert(usersOrders)
+        .values({
+          userId,
+          orderDetailId: orderDetail[0].orderDetailId,
+        })
+        .returning();
+
+      console.log("userOrders", userOrders);
+
+      const userSubscription = await this.db
+        .insert(subscription)
+        .values({
+          stripeCustomerId: "harry",
+          stripeSubscriptionId: paymentIntendId,
+          stripPriceId: "test123",
+          stripeCurrentPeriodEnd: new Date().toISOString(),
+          orderDetailId: orderDetail[0].orderDetailId,
+        })
+        .returning();
+
+      console.log("userSubscription", userSubscription);
+
+      const productId = JSON.parse(products).map((product) => {
+        return {
+          orderDetailId: orderDetail[0].orderDetailId,
+          productId: product.productId,
+          quantity: product.quantity,
+        };
+      });
+      const orderProductsInsert = await this.db
+        .insert(orderProducts)
+        .values(productId)
+        .returning();
+
+      console.log("orderProductsInsert", orderProductsInsert);
+
+      console.log({
+        orderDetail,
+        userSubscription,
+        userOrders,
+        orderProductsInsert,
+      });
+
       return {
-        orderDetailId: orderDetail[0].orderDetailId,
-        productId: product.productId,
+        status: 200,
+        message: "Order successfully",
       };
-    });
-    const orderProductsInsert = await this.db
-      .insert(orderProducts)
-      .values(productId);
 
-    // const customers = await
-
-    return {
-      message: "Order successfully",
-    };
-
-    // return customers.data;
+      // return customers.data;
+    } catch (error) {
+      console.log({ error });
+      throw new InternalServerErrorException("Failed to create order");
+    }
   }
 
   async createProduct(productValues: ProductValuesType) {
@@ -185,22 +218,6 @@ export class StripeService {
       throw new NotFoundException("Sản phẩm không tồn tại");
     }
 
-    const metadata = {
-      user: JSON.stringify(info),
-      products: JSON.stringify(
-        products.map((product) => {
-          return {
-            productId: product.productId,
-            quantity: product.quantityOrder,
-          };
-        })
-      ),
-      address,
-      phone,
-      method,
-      paymentMethod,
-    };
-
     const orderedProducts = products.filter((product) => {
       return isExistingProducts.find((existingProduct) => {
         return existingProduct.id === product.productId;
@@ -224,6 +241,13 @@ export class StripeService {
       };
     });
 
+    const productInformation = products.map((product) => {
+      return {
+        productId: product.productId,
+        quantity: product.quantityOrder,
+      };
+    });
+
     try {
       const userSubscription = await this.db
         .select()
@@ -243,9 +267,15 @@ export class StripeService {
           mode: "payment",
           billing_address_collection: "auto",
           customer_email: user.email || null,
-          metadata,
+          metadata: {
+            user: info.id.toString(),
+            products: JSON.stringify(productInformation),
+            address,
+            phone,
+            method,
+            paymentMethod,
+          },
           line_items: line_items,
-
           success_url: successUrl,
           cancel_url: cancelUrl,
         });
@@ -265,73 +295,54 @@ export class StripeService {
   async webhookData(raw: any, signature: string) {
     let event: Stripe.Event;
 
+    console.log({ raw, signature });
+
     const signInSecretLocal =
       "whsec_7c5951bf1e6c8fac053e102d1970b46cbd13ee010bf28a865cd2275de4c86375";
 
     try {
       // const rawBody = JSON.stringify(req.body);
-      event = this.stripe.webhooks.constructEvent(
+      event = await this.stripe.webhooks.constructEvent(
         raw,
         signature,
         signInSecretLocal
       );
     } catch (error) {
       console.log("webhook error: ", error);
-      // console.error("Webhook signature verification failed.");
       throw new HttpException("Webhook signature verification failed.", 400);
     }
 
-    const session = event.data.object as Stripe.Checkout.Session;
+    console.log("Event received: ", event.type);
 
-    console.log({ session });
+    if (event.type === "checkout.session.completed") {
+      // Retrieve session details
+      const session = event.data.object as Stripe.Checkout.Session;
 
-    //* the account of the user
-    // if (!session.metadata.phoneAuth) {
-    //   throw new HttpException("User not authenticated", 400);
-    // }
+      console.log("Checkout Session:", session);
 
-    // if (event.type === "payment_intent.succeeded") {
-    //   const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      const metadata = session.metadata; // Access metadata here
+      const paymentIntentId = session.payment_intent; // If you need payment intent ID
 
-    //   const { id: paymentIntendId, metadata } = paymentIntent;
+      console.log("Metadata:", metadata);
 
-    //   try {
-    //     const paymentData = await this.stripe.paymentIntents.retrieve(
-    //       paymentIntent.id as string
-    //     );
-
-    //     console.log(paymentData.metadata);
-    //   } catch (error) {}
-    // }
-
-    switch (event.type) {
-      case "payment_intent.succeeded":
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
-
-        const { id: paymentIntendId, metadata, amount } = paymentIntent;
-
-        this.customerOrdered(paymentIntendId, metadata, amount);
-
-        console.log({ paymentIntent });
-        console.log(
-          `PaymentIntent for ${paymentIntent.amount} was successful!`
+      if (metadata) {
+        const { amount_total } = session;
+        const result = await this.customerOrdered(
+          paymentIntentId as string,
+          metadata,
+          amount_total
         );
 
-        break;
-
-      case "payment_method.attached":
-        const paymentMethod = event.data.object;
-
-        console.log({ paymentMethod });
-        // Then define and call a method to handle the successful attachment of a PaymentMethod.
-        // handlePaymentMethodAttached(paymentMethod);
-        break;
-
-      default:
-        console.error(`Unhandled event type: ${event.type}`);
+        console.log({ result });
+        return result;
+      }
+    } else if (event.type === "payment_intent.succeeded") {
+      console.log("Payment Intent Succeeded:", event.data.object);
+    } else {
+      console.log(`Unhandled event type: ${event.type}`);
     }
 
-    // res.status(200).json({ received: true });
+    return { received: true };
   }
 
   async retrieveBalance() {

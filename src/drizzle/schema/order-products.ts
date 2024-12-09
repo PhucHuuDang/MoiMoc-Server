@@ -90,5 +90,5 @@ export const orderProductsRelations = relations(orderProducts, ({ one }) => ({
   }),
 }));
 
-export type OrderProductsValues = InferInsertModel<typeof orderProducts>;
+export type OrderProductsInsert = InferInsertModel<typeof orderProducts>;
 export type OrderProductSelectValues = InferSelectModel<typeof orderProducts>;
