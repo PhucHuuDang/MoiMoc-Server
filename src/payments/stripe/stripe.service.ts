@@ -295,13 +295,10 @@ export class StripeService {
   async webhookData(raw: any, signature: string) {
     let event: Stripe.Event;
 
-    console.log({ raw, signature });
-
     const signInSecretLocal =
       "whsec_7c5951bf1e6c8fac053e102d1970b46cbd13ee010bf28a865cd2275de4c86375";
 
     try {
-      // const rawBody = JSON.stringify(req.body);
       event = await this.stripe.webhooks.constructEvent(
         raw,
         signature,
@@ -315,7 +312,6 @@ export class StripeService {
     console.log("Event received: ", event.type);
 
     if (event.type === "checkout.session.completed") {
-      // Retrieve session details
       const session = event.data.object as Stripe.Checkout.Session;
 
       console.log("Checkout Session:", session);
@@ -324,6 +320,10 @@ export class StripeService {
       const paymentIntentId = session.payment_intent; // If you need payment intent ID
 
       console.log("Metadata:", metadata);
+
+      const { user } = metadata;
+
+      const userId = Number(user);
 
       if (metadata) {
         const { amount_total } = session;

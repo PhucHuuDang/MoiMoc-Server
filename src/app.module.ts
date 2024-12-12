@@ -28,6 +28,7 @@ import { AboutMoiMocModule } from './about-moi-moc/about-moi-moc.module';
 import { ImagesModelsModule } from './images-models/images-models.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { ActivityModule } from './activity/activity.module';
+import { ManageOrdersModule } from './manage-orders/manage-orders.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { ActivityModule } from './activity/activity.module';
     ImagesModelsModule,
     FeedbackModule,
     ActivityModule,
+    ManageOrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService, RawBodyMiddleware, JsonBodyMiddleware],
