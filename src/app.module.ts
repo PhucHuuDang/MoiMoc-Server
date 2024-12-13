@@ -22,13 +22,14 @@ import { PaymentMethodsModule } from "./payment-methods/payment-methods.module";
 import { DiscussionModule } from "./discussion/discussion.module";
 import { RawBodyMiddleware } from "./raw-body.middleware";
 import { JsonBodyMiddleware } from "./json-body.middleware";
-import { DeliveryMethodsModule } from './delivery-methods/delivery-methods.module';
-import { PayosModule } from './payos/payos.module';
-import { AboutMoiMocModule } from './about-moi-moc/about-moi-moc.module';
-import { ImagesModelsModule } from './images-models/images-models.module';
-import { FeedbackModule } from './feedback/feedback.module';
-import { ActivityModule } from './activity/activity.module';
-import { ManageOrdersModule } from './manage-orders/manage-orders.module';
+import { DeliveryMethodsModule } from "./delivery-methods/delivery-methods.module";
+import { PayosModule } from "./payos/payos.module";
+import { AboutMoiMocModule } from "./about-moi-moc/about-moi-moc.module";
+import { ImagesModelsModule } from "./images-models/images-models.module";
+import { FeedbackModule } from "./feedback/feedback.module";
+import { ActivityModule } from "./activity/activity.module";
+import { ManageOrdersModule } from "./manage-orders/manage-orders.module";
+import { ManagePaymentsModule } from "./manage-payments/manage-payments.module";
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { ManageOrdersModule } from './manage-orders/manage-orders.module';
     FeedbackModule,
     ActivityModule,
     ManageOrdersModule,
+    ManagePaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService, RawBodyMiddleware, JsonBodyMiddleware],
