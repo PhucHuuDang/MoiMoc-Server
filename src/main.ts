@@ -15,6 +15,7 @@ async function bootstrap() {
       process.env.PRODUCTION_DOMAIN,
       process.env.MOIMOC_DOMAIN,
       process.env.MOIMOC_COM_DOMAIN,
+      process.env.MOIMOC_WWW_COM_DOMAIN,
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
     allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
