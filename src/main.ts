@@ -9,17 +9,39 @@ async function bootstrap() {
     logger: ["log", "error", "warn"],
   });
 
+  // app.enableCors({
+  //   origin: [
+  //     process.env.LOCAL_DOMAIN,
+  //     process.env.PRODUCTION_DOMAIN,
+  //     process.env.MOIMOC_DOMAIN,
+  //     process.env.MOIMOC_COM_DOMAIN,
+  //     process.env.MOIMOC_WWW_COM_DOMAIN,
+  //   ],
+  //   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
+  //   allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+  //   credentials: true, // Allow credentials (cookies, authorization headers)
+  // });
+
   app.enableCors({
-    origin: [
-      process.env.LOCAL_DOMAIN,
-      process.env.PRODUCTION_DOMAIN,
-      process.env.MOIMOC_DOMAIN,
-      process.env.MOIMOC_COM_DOMAIN,
-      process.env.MOIMOC_WWW_COM_DOMAIN,
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
-    credentials: true, // Allow credentials (cookies, authorization headers)
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        process.env.LOCAL_DOMAIN,
+        process.env.PRODUCTION_DOMAIN,
+        process.env.MOIMOC_DOMAIN,
+        process.env.MOIMOC_COM_DOMAIN,
+        process.env.MOIMOC_WWW_COM_DOMAIN,
+      ].filter(Boolean);
+
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn("Blocked CORS origin:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   });
 
   app.use("/stripe/webhook", bodyParser.raw({ type: "*/*" }));
