@@ -21,10 +21,7 @@ async function bootstrap() {
     credentials: true, // Allow credentials (cookies, authorization headers)
   });
 
-  app.use(
-    "/stripe/webhook",
-    bodyParser.raw({ type: "*/*" }) // Ensure raw body is passed for Stripe signature verification
-  );
+  app.use("/stripe/webhook", bodyParser.raw({ type: "*/*" }));
 
   // app.use("/stripe/webhook", bodyParser.raw({ type: "application/json" }));
 
