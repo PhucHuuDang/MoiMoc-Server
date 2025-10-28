@@ -18,7 +18,7 @@ async function bootstrap() {
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
     allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    credentials: true, // Allow credentials (cookies, authorization headers)
   });
 
   app.use(
