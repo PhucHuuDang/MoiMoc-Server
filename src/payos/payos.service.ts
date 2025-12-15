@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 
 // import { PayOS } from "@payos/node";
 const PayOS = require("@payos/node");
-
+// import PayOS from "@payos/node";
 import { createId } from "@paralleldrive/cuid2";
 import { OrderValuesType } from "src/payments/stripe/types/stripe-types";
 
@@ -40,9 +40,10 @@ export class PayosService {
     const items = checkoutValues.products.map((product) => {
       return {
         name: product.productName,
-        price: product.discountPrice
-          ? Number(product.discountPrice)
-          : Number(product.price),
+        // price: product.discountPrice
+        //   ? Number(product.discountPrice)
+        //   : Number(product.price),
+        price: 1000,
         quantity: product.quantityOrder,
       };
     });
