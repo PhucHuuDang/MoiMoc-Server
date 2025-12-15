@@ -40,10 +40,10 @@ export class PayosService {
     const items = checkoutValues.products.map((product) => {
       return {
         name: product.productName,
-        // price: product.discountPrice
-        //   ? Number(product.discountPrice)
-        //   : Number(product.price),
-        price: 1000,
+        price: product.discountPrice
+          ? Number(product.discountPrice)
+          : Number(product.price),
+        // price: 1000,
         quantity: product.quantityOrder,
       };
     });
@@ -51,7 +51,7 @@ export class PayosService {
     const body = {
       orderCode: Number(String(Date.now()).slice(-6)),
       description: `DON HANG MOI MOC`,
-      amount,
+      amount: 1000,
       items,
       buyerName: checkoutValues.user.name,
       buyerEmail: checkoutValues.user.email,
