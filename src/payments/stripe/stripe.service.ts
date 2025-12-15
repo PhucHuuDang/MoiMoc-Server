@@ -85,7 +85,7 @@ export class StripeService {
         })
         .returning();
 
-      console.log("userSubscription", userSubscription);
+      // console.log("userSubscription", userSubscription);
 
       const productId = JSON.parse(products).map((product) => {
         return {

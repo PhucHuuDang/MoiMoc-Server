@@ -57,8 +57,8 @@ export class PayosService {
       buyerEmail: checkoutValues.user.email,
       buyerPhone: checkoutValues.phone,
       buyerAddress: checkoutValues.address,
-      returnUrl: "https://www.moimoc.shop/success",
-      cancelUrl: "https://www.moimoc.shop/cancel",
+      returnUrl: "https://www.moimoc.com/success",
+      cancelUrl: "https://www.moimoc.com/cancel",
     };
 
     try {
