@@ -51,7 +51,7 @@ export class PayosService {
     const body = {
       orderCode: Number(String(Date.now()).slice(-6)),
       description: `DON HANG MOI MOC`,
-      amount: 1000,
+      amount: 2000,
       items,
       buyerName: checkoutValues.user.name,
       buyerEmail: checkoutValues.user.email,
