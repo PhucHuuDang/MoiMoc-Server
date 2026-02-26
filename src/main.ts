@@ -22,14 +22,20 @@ async function bootstrap() {
   //   credentials: true, // Allow credentials (cookies, authorization headers)
   // });
 
+  const allowedOrigins = [
+    process.env.LOCAL_DOMAIN,
+    process.env.PRODUCTION_DOMAIN,
+    process.env.MOIMOC_DOMAIN,
+    process.env.MOIMOC_COM_DOMAIN,
+    process.env.MOIMOC_WWW_COM_DOMAIN,
+    "https://moimoc.com",
+    "https://www.moimoc.com",
+  ]
+    .filter(Boolean)
+    .map((domain) => domain?.replace(/\/$/, "")) as string[];
+
   app.enableCors({
-    origin: [
-      process.env.LOCAL_DOMAIN,
-      process.env.PRODUCTION_DOMAIN,
-      process.env.MOIMOC_DOMAIN,
-      process.env.MOIMOC_COM_DOMAIN,
-      process.env.MOIMOC_WWW_COM_DOMAIN,
-    ].filter(Boolean) as string[],
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization", "Accept"],
     credentials: true,
