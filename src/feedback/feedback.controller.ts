@@ -24,7 +24,7 @@ export class FeedbackController {
   @Post()
   addFeedback(
     @Request() req: any,
-    @Body() feedbackValues: InsertFeedbackProps
+    @Body() feedbackValues: InsertFeedbackProps,
   ) {
     const userId = req.user.id;
 
@@ -50,7 +50,7 @@ export class FeedbackController {
   @Patch(":id")
   update(
     @Param("id") id: string,
-    @Body() updateFeedbackDto: InsertFeedbackProps
+    @Body() updateFeedbackDto: InsertFeedbackProps,
   ) {
     return this.feedbackService.update(+id, updateFeedbackDto);
   }
