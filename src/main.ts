@@ -23,24 +23,15 @@ async function bootstrap() {
   // });
 
   app.enableCors({
-    origin: (origin, callback) => {
-      const allowedOrigins = [
-        process.env.LOCAL_DOMAIN,
-        process.env.PRODUCTION_DOMAIN,
-        process.env.MOIMOC_DOMAIN,
-        process.env.MOIMOC_COM_DOMAIN,
-        process.env.MOIMOC_WWW_COM_DOMAIN,
-      ].filter(Boolean);
-
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.warn("Blocked CORS origin:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: [
+      process.env.LOCAL_DOMAIN,
+      process.env.PRODUCTION_DOMAIN,
+      process.env.MOIMOC_DOMAIN,
+      process.env.MOIMOC_COM_DOMAIN,
+      process.env.MOIMOC_WWW_COM_DOMAIN,
+    ].filter(Boolean) as string[],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
     credentials: true,
   });
 
